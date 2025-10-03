@@ -1,56 +1,76 @@
+/* --- 1. THEME VARIABLES --- */
+:root {
+    --bg-color: #f4f4f4;
+    --surface-color: #ffffff;
+    --text-color: #333333;
+    --text-muted-color: #666666;
+    --primary-color: #0275d8;
+    --border-color: #dddddd;
+    --input-bg-color: #ffffff;
+    --header-bg-color: #f7f7f7;
+    --danger-color: #d9534f;
+    --danger-text-color: #d9534f;
+}
+
+body.dark-mode {
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-muted-color: #a0a0a0;
+    --primary-color: #58a6ff;
+    --border-color: #333333;
+    --input-bg-color: #2c2c2c;
+    --header-bg-color: #252525;
+    --danger-color: #f85149;
+    --danger-text-color: #f85149;
+}
+
+/* --- 2. GENERAL STYLES (using variables) --- */
 body {
     font-family: sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
     width: 80%;
+    max-width: 900px;
     margin: auto;
     overflow: hidden;
     padding: 20px;
-    background: #fff;
+    background: var(--surface-color);
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
 }
 
-h1, h2 {
-    color: #0275d8;
-}
-
-.silver-price, .coin-list, .totals, .add-coin-form {
-    margin-bottom: 20px;
-}
-
-.coin-item {
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
 }
 
-.coin-item input {
-    width: 60px;
-    padding: 5px;
+h1, h2 {
+    color: var(--primary-color);
 }
 
-.totals p {
-    font-size: 1.2em;
-}
-
-.add-coin-form input {
+input {
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
     padding: 8px;
-    margin-right: 10px;
+    font-size: 1em;
 }
 
-.add-coin-form button {
-    padding: 8px 15px;
-    background: #0275d8;
-    color: #fff;
-    border: none;
-    cursor: pointer;
+/* --- 3. COMPONENT STYLES --- */
+.totals, .silver-price, .search-container, .coin-list {
+    margin-bottom: 20px;
 }
 
 .silver-price .price-input-group {
@@ -61,113 +81,56 @@ h1, h2 {
 
 .silver-price label {
     margin-right: 10px;
-    min-width: 180px; /* Aligns the input boxes */
+    min-width: 180px;
 }
 
-.silver-price input {
-    width: 120px;
-    padding: 8px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.clear-button {
+    display: block; width: 100%; padding: 10px; margin-top: 15px;
+    font-size: 1em; font-weight: bold; color: var(--danger-text-color);
+    background-color: transparent; border: 1px solid var(--danger-color);
+    border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
 }
 
-/* Add these new rules to your style.css */
+.clear-button:hover {
+    background-color: var(--danger-color);
+    color: var(--surface-color);
+}
+
+#search-input {
+    width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box;
+}
 
 .country-group {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     margin-bottom: 15px;
 }
 
-.country-group[open] .country-title {
-    border-bottom: 1px solid #ddd;
-}
-
 .country-title {
-    font-size: 1.5em;
-    font-weight: bold;
-    padding: 15px;
-    cursor: pointer;
-    background-color: #f7f7f7;
-    color: #0275d8;
-    list-style: none; /* Removes the default triangle */
+    font-size: 1.5em; font-weight: bold; padding: 15px; cursor: pointer;
+    background-color: var(--header-bg-color); color: var(--primary-color);
+    list-style: none; transition: background-color 0.3s;
 }
+.country-group[open] .country-title { border-bottom: 1px solid var(--border-color); }
+.country-title::-webkit-details-marker { display: none; }
+.country-title::before { content: '▶'; margin-right: 10px; font-size: 0.8em; display: inline-block; transition: transform 0.2s; }
+.country-group[open] > summary::before { transform: rotate(90deg); }
 
-/* Add a custom triangle/arrow */
-.country-title::-webkit-details-marker {
-    display: none; 
-}
-.country-title::before {
-    content: '▶';
-    margin-right: 10px;
-    font-size: 0.8em;
-    display: inline-block;
-    transition: transform 0.2s;
-}
-
-.country-group[open] > summary::before {
-    transform: rotate(90deg);
-}
-
-/* Update your existing .coin-item style */
 .coin-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
+    display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;
+    border-bottom: 1px solid var(--border-color);
 }
+.coin-item:last-child { border-bottom: none; }
 
-/* Ensure the quantity input is small */
-.coin-item input {
-    width: 60px; /* Keep this small */
-    padding: 5px;
-}
+.coin-item > span:first-child { flex-grow: 1; margin-right: 10px; }
+.coin-item input { width: 60px; padding: 5px; text-align: center; }
+.coin-subtotal { font-weight: bold; min-width: 80px; text-align: right; color: var(--text-muted-color); }
 
-/* Style the subtotal display */
-.coin-subtotal {
-    font-weight: bold;
-    min-width: 80px; /* Allocate space for the value */
-    text-align: right;
-}
-
-/* Give the coin name/details span some room to breathe */
-.coin-item > span:first-child {
-    flex-grow: 1; /* Allows the name/date/weight to take up most of the space */
-    margin-right: 10px;
-}
-
-/* Add this new style for the Clear All button */
-.clear-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 15px;
-    font-size: 1em;
-    font-weight: bold;
-    color: #d9534f;
-    background-color: #f7f7f7;
-    border: 1px solid #d9534f;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.clear-button:hover {
-    background-color: #d9534f;
-    color: #fff;
-}
-
-/* Add these new styles for the search bar */
-.search-container {
-    margin-bottom: 20px;
-}
-
-#search-input {
-    width: 100%;
-    padding: 12px;
-    font-size: 1.1em;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box; /* Important for padding and width */
-}
+/* --- 4. THEME TOGGLE SWITCH STYLES --- */
+.theme-switch-wrapper { display: flex; align-items: center; }
+.theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--primary-color); }
+input:checked + .slider:before { transform: translateX(24px); }

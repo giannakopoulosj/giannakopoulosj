@@ -6,15 +6,25 @@
     <title>Silver Coin Calculator</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body> <!-- The 'dark-mode' class will be added here by JS -->
     <div class="container">
+        <div class="header">
+            <h1>Silver Coin Calculator</h1>
+            <!-- NEW THEME TOGGLE SWITCH -->
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="theme-toggle">
+                    <input type="checkbox" id="theme-toggle" />
+                    <div class="slider round"></div>
+                </label>
+            </div>
+        </div>
+
         <div class="totals">
             <h2>Totals</h2>
             <p><strong>Total Silver Weight:</strong> <span class="total-silver-weight">0.000</span> tOz</p>
             <p><strong>Melt Value:</strong> €<span class="total-melt-value">0.00</span></p>
             <button id="clear-all-btn" class="clear-button">Clear All Quantities</button>
         </div>
-        <h1>Silver Coin Calculator</h1>
 
         <div class="silver-price">
             <h2>Silver Spot Price</h2>
@@ -28,7 +38,6 @@
             </div>
         </div>
         
-        <!-- NEW SEARCH BAR ADDED HERE -->
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Search for a coin...">
         </div>

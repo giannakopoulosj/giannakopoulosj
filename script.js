@@ -5,11 +5,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const silverPriceGramEl = document.getElementById('silver-price-gram');
     const clearAllBtn = document.getElementById('clear-all-btn');
     const searchInput = document.getElementById('search-input');
+    const themeToggle = document.getElementById('theme-toggle'); // Get the new theme toggle
 
     // Data
     let groupedCoins = {};
     const TROY_OUNCE_IN_GRAMS = 31.1034768;
     const STORAGE_KEY = 'coinQuantities';
+
+    // --- NEW: Theme Management ---
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeToggle.checked = false;
+        }
+    }
+    
+    function saveTheme(theme) {
+        localStorage.setItem('theme', theme);
+    }
+
+    themeToggle.addEventListener('change', () => {
+        const newTheme = themeToggle.checked ? 'dark' : 'light';
+        applyTheme(newTheme);
+        saveTheme(newTheme);
+    });
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else if (systemPrefersDark) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+    }
+
 
     // --- Search Functionality ---
     searchInput.addEventListener('input', () => {
@@ -19,20 +55,16 @@ document.addEventListener('DOMContentLoaded', () => {
             group.querySelectorAll('.coin-item').forEach(item => {
                 const coinText = item.querySelector('span:first-child').textContent.toLowerCase();
                 if (coinText.includes(query)) {
-                    item.style.display = 'flex';
-                    hasVisibleCoins = true;
+                    item.style.display = 'flex'; hasVisibleCoins = true;
                 } else {
                     item.style.display = 'none';
                 }
             });
-
             if (hasVisibleCoins) {
-                group.style.display = 'block';
-                group.open = true;
+                group.style.display = 'block'; group.open = true;
             } else {
                 group.style.display = 'none';
             }
-
             if (query === '') {
                 group.open = false;
             }
@@ -40,49 +72,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Save, Load, and Clear Functions ---
+    // (This section remains unchanged)
     function saveQuantities() {
         const quantities = {};
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const key = input.dataset.key;
             const quantity = input.value;
-            if (quantity && parseInt(quantity) > 0) {
-                quantities[key] = quantity;
-            }
+            if (quantity && parseInt(quantity) > 0) { quantities[key] = quantity; }
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(quantities));
     }
-
     function loadQuantities() {
         const savedQuantities = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const key = input.dataset.key;
-            if (savedQuantities[key]) {
-                input.value = savedQuantities[key];
-            }
+            if (savedQuantities[key]) { input.value = savedQuantities[key]; }
         });
     }
-
     clearAllBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all coin quantities?')) {
-            document.querySelectorAll('.coin-quantity').forEach(input => {
-                input.value = '0';
-            });
+            document.querySelectorAll('.coin-quantity').forEach(input => { input.value = '0'; });
             localStorage.removeItem(STORAGE_KEY);
             calculateTotals();
         }
     });
 
     // --- Price Synchronization ---
+    // (This section remains unchanged)
     function updateGramFromToz() {
         const tozPrice = parseFloat(silverPriceTozEl.value) || 0;
         silverPriceGramEl.value = (tozPrice / TROY_OUNCE_IN_GRAMS).toFixed(4);
     }
-
-    silverPriceTozEl.addEventListener('input', () => {
-        updateGramFromToz();
-        calculateTotals();
-    });
-
+    silverPriceTozEl.addEventListener('input', () => { updateGramFromToz(); calculateTotals(); });
     silverPriceGramEl.addEventListener('input', () => {
         const gramPrice = parseFloat(silverPriceGramEl.value) || 0;
         silverPriceTozEl.value = (gramPrice * TROY_OUNCE_IN_GRAMS).toFixed(2);
@@ -228,6 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Initial Load ---
+    loadTheme(); // <-- LOAD THEME FIRST!
     updateGramFromToz();
     loadApp();
 });
+// NOTE: I've collapsed the unchanged functions above for brevity, 
+// but you should use your full, existing functions for groupCoinsByCountry, renderCoins, etc.
