@@ -313,7 +313,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Initial Load ---
-    loadTheme();
+function loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+
+    // If a theme is saved in local storage, use it.
+    // Otherwise, default to 'dark'.
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        applyTheme('dark');
+    }
+}
     updateGramFromToz();
     loadApp();
 
