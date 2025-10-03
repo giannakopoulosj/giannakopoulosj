@@ -10,6 +10,8 @@
     --header-bg-color: #f7f7f7;
     --danger-color: #d9534f;
     --danger-text-color: #d9534f;
+    --filtered-bg-color-light: #fef1e2; /* Light orange tint */
+    --filtered-text-color-light: #e67e22; /* Orange text */
 }
 
 body.dark-mode {
@@ -23,6 +25,8 @@ body.dark-mode {
     --header-bg-color: #212529;
     --danger-color: #dc3545;
     --danger-text-color: #dc3545;
+    --filtered-bg-color-dark: #4d4432; /* Darker orange tint */
+    --filtered-text-color-dark: #f0c419; /* Yellowish orange text */
 }
 
 /* --- 2. GENERAL STYLES (using variables) --- */
@@ -76,6 +80,30 @@ input {
     margin-bottom: 25px;
 }
 
+/* NEW: Styles for when totals are filtered */
+.totals.filtered-active {
+    background-color: var(--filtered-bg-color-light);
+    border-color: var(--filtered-text-color-light);
+    box-shadow: 0 0 8px rgba(230, 126, 34, 0.4); /* Subtle glow */
+}
+body.dark-mode .totals.filtered-active {
+    background-color: var(--filtered-bg-color-dark);
+    border-color: var(--filtered-text-color-dark);
+    box-shadow: 0 0 8px rgba(240, 196, 25, 0.4);
+}
+
+.filtered-text {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: var(--filtered-text-color-light);
+    margin-left: 5px;
+    transition: color 0.3s;
+}
+body.dark-mode .filtered-text {
+    color: var(--filtered-text-color-dark);
+}
+
+
 .silver-price .price-input-group {
     margin-bottom: 10px; display: flex; align-items: center;
 }
@@ -90,41 +118,26 @@ input {
 }
 .clear-button:hover { background-color: var(--danger-color); color: #fff; }
 
-/* IMPORTANT: .search-container must be relative for absolute positioning of the button */
 .search-container {
     margin-bottom: 25px;
-    position: relative; /* This is the key */
+    position: relative;
 }
 
 #search-input {
     width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box;
-    padding-right: 40px; /* Add extra padding to make space for the button */
+    padding-right: 40px;
 }
 
-/* Styles for the clear search button */
 .clear-search-button {
     position: absolute;
-    right: 10px; /* Position from the right edge of the container */
-    top: 50%;
-    transform: translateY(-50%); /* Vertically center the button */
-    background: none;
-    border: none;
-    color: var(--text-muted-color); /* Matches muted text color */
-    font-size: 1.5em;
-    cursor: pointer;
-    padding: 0 5px;
-    transition: color 0.2s;
-    line-height: 1; /* Ensures the 'x' is vertically centered within the button */
-    height: 1.5em; /* Explicit height helps with vertical alignment */
-    width: 1.5em; /* Explicit width */
-    display: flex; /* Use flex to center the X if it's an SVG */
-    align-items: center;
-    justify-content: center;
+    right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--text-muted-color);
+    font-size: 1.5em; cursor: pointer; padding: 0 5px; transition: color 0.2s;
+    line-height: 1; height: 1.5em; width: 1.5em;
+    display: flex; align-items: center; justify-content: center;
 }
-
-.clear-search-button:hover {
-    color: var(--primary-color);
-}
+.clear-search-button:hover { color: var(--primary-color); }
 
 .country-group { border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 15px; }
 .country-title {
@@ -175,19 +188,11 @@ input:checked + .slider:before { transform: translateX(24px); }
     color: var(--text-muted-color);
 }
 
-.app-footer p {
-    margin-bottom: 1rem;
-}
+.app-footer p { margin-bottom: 1rem; }
 
 .github-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: var(--text-muted-color);
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--text-muted-color);
     transition: color 0.2s;
 }
-
-.github-link:hover {
-    color: var(--primary-color);
-}
+.github-link:hover { color: var(--primary-color); }

@@ -6,8 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const silverPriceGramEl = document.getElementById('silver-price-gram');
     const clearAllBtn = document.getElementById('clear-all-btn');
     const searchInput = document.getElementById('search-input');
-    const clearSearchBtn = document.getElementById('clear-search-btn'); // Correctly referenced
+    const clearSearchBtn = document.getElementById('clear-search-btn');
     const themeToggle = document.getElementById('theme-toggle');
+    const totalsSection = document.getElementById('totals-section'); // NEW: Get the totals section
+    const filteredIndicator = document.getElementById('filtered-indicator'); // NEW: Get the filtered text indicator
 
     // Data
     let groupedCoins = {};
@@ -44,18 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Search Functionality (FIXED AND UPDATED) ---
-
-    // Define filterCoins function once, at the top level
+    // --- Search Functionality (UPDATED for visual distinction) ---
     function filterCoins() {
         const query = searchInput.value.toLowerCase().trim();
         const searchWords = query.split(' ').filter(word => word.length > 0);
 
-        // Show/hide clear search button based on query length
+        // Show/hide clear search button
         if (query.length > 0) {
             clearSearchBtn.style.display = 'block';
+            // NEW: Add filtered class and show indicator when search is active
+            totalsSection.classList.add('filtered-active');
+            filteredIndicator.style.display = 'inline';
         } else {
             clearSearchBtn.style.display = 'none';
+            // NEW: Remove filtered class and hide indicator when search is cleared
+            totalsSection.classList.remove('filtered-active');
+            filteredIndicator.style.display = 'none';
         }
 
         document.querySelectorAll('.country-group').forEach(group => {
@@ -83,23 +89,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 group.style.display = 'none';
             }
             
-            // If the search bar is cleared, collapse groups but keep them visible
             if (query === '') {
                 group.open = false;
                 group.style.display = 'block';
             }
         });
-        calculateTotals(); // Recalculate totals based on visible items
+        calculateTotals();
     }
 
-    // Attach event listener to search input to call filterCoins
     searchInput.addEventListener('input', filterCoins);
 
-    // Event listener for the clear search button
     clearSearchBtn.addEventListener('click', () => {
-        searchInput.value = ''; // Clear the input field
-        filterCoins();          // Re-run the filter to show all coins and hide the button
-        searchInput.focus();    // Put focus back on the search input
+        searchInput.value = '';
+        filterCoins();
+        searchInput.focus();
     });
 
     // --- Save, Load, and Clear Functions ---
@@ -308,8 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
             groupedCoins = groupCoinsByCountry(result.data);
             renderCoins();
             loadQuantities();
-            calculateTotals(); // Initial calculation after loading quantities
-            filterCoins(); // Initial filter call to ensure clear button state is correct
+            calculateTotals();
+            filterCoins(); // Ensure initial state reflects if search input has default text
         } catch (error) {
             console.error('Error loading application:', error);
             errorContainer.style.display = 'block';
