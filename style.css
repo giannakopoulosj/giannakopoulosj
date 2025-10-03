@@ -1,0 +1,173 @@
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #0275d8;
+}
+
+.silver-price, .coin-list, .totals, .add-coin-form {
+    margin-bottom: 20px;
+}
+
+.coin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.coin-item input {
+    width: 60px;
+    padding: 5px;
+}
+
+.totals p {
+    font-size: 1.2em;
+}
+
+.add-coin-form input {
+    padding: 8px;
+    margin-right: 10px;
+}
+
+.add-coin-form button {
+    padding: 8px 15px;
+    background: #0275d8;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.silver-price .price-input-group {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.silver-price label {
+    margin-right: 10px;
+    min-width: 180px; /* Aligns the input boxes */
+}
+
+.silver-price input {
+    width: 120px;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Add these new rules to your style.css */
+
+.country-group {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.country-group[open] .country-title {
+    border-bottom: 1px solid #ddd;
+}
+
+.country-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 15px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    color: #0275d8;
+    list-style: none; /* Removes the default triangle */
+}
+
+/* Add a custom triangle/arrow */
+.country-title::-webkit-details-marker {
+    display: none; 
+}
+.country-title::before {
+    content: '▶';
+    margin-right: 10px;
+    font-size: 0.8em;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.country-group[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+/* Update your existing .coin-item style */
+.coin-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+/* Ensure the quantity input is small */
+.coin-item input {
+    width: 60px; /* Keep this small */
+    padding: 5px;
+}
+
+/* Style the subtotal display */
+.coin-subtotal {
+    font-weight: bold;
+    min-width: 80px; /* Allocate space for the value */
+    text-align: right;
+}
+
+/* Give the coin name/details span some room to breathe */
+.coin-item > span:first-child {
+    flex-grow: 1; /* Allows the name/date/weight to take up most of the space */
+    margin-right: 10px;
+}
+
+/* Add this new style for the Clear All button */
+.clear-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #d9534f;
+    background-color: #f7f7f7;
+    border: 1px solid #d9534f;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.clear-button:hover {
+    background-color: #d9534f;
+    color: #fff;
+}
+
+/* Add these new styles for the search bar */
+.search-container {
+    margin-bottom: 20px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; /* Important for padding and width */
+}
