@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
+    const errorContainer = document.getElementById('error-container');
     const coinListEl = document.getElementById('coin-list');
     const silverPriceTozEl = document.getElementById('silver-price-toz');
     const silverPriceGramEl = document.getElementById('silver-price-gram');
@@ -118,14 +119,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Price Synchronization ---
+    // --- Price Synchronization & VALIDATION ---
     function updateGramFromToz() {
-        const tozPrice = parseFloat(silverPriceTozEl.value) || 0;
+        let tozPrice = parseFloat(silverPriceTozEl.value) || 0;
+        // NEW: Validate for negative values
+        if (tozPrice < 0) {
+            tozPrice = 0;
+            silverPriceTozEl.value = '0';
+        }
         silverPriceGramEl.value = (tozPrice / TROY_OUNCE_IN_GRAMS).toFixed(4);
     }
-    silverPriceTozEl.addEventListener('input', () => { updateGramFromToz(); calculateTotals(); });
+
+    silverPriceTozEl.addEventListener('input', () => {
+        updateGramFromToz();
+        calculateTotals();
+    });
+
     silverPriceGramEl.addEventListener('input', () => {
-        const gramPrice = parseFloat(silverPriceGramEl.value) || 0;
+        let gramPrice = parseFloat(silverPriceGramEl.value) || 0;
+        // NEW: Validate for negative values
+        if (gramPrice < 0) {
+            gramPrice = 0;
+            silverPriceGramEl.value = '0';
+        }
         silverPriceTozEl.value = (gramPrice * TROY_OUNCE_IN_GRAMS).toFixed(2);
         calculateTotals();
     });
@@ -178,9 +194,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalMeltValueEl = document.querySelector('.total-melt-value');
         let grandTotalWeight = 0;
         const currentSilverPriceToz = parseFloat(silverPriceTozEl.value) || 0;
+
         document.querySelectorAll('.coin-quantity').forEach(input => {
+            let quantity = parseInt(input.value) || 0;
+            
+            // NEW: Validate for negative quantities
+            if (quantity < 0) {
+                quantity = 0;
+                input.value = '0';
+            }
+
             if (input.offsetParent === null) return;
-            const quantity = parseInt(input.value) || 0;
             const silverWeight = parseFloat(input.dataset.silverWeight);
             const coinTotalWeight = silverWeight * quantity;
             const coinMeltValue = coinTotalWeight * currentSilverPriceToz;
@@ -196,13 +220,21 @@ document.addEventListener('DOMContentLoaded', () => {
         saveQuantities();
     }
 
+    // --- CSV Loading and Parsing with VALIDATION ---
+    // UPDATED: Now returns both data and errors
     function parseCSV(text) {
         const lines = text.trim().split('\n');
-        if (lines.length < 2) return [];
+        if (lines.length < 2) return { data: [], errors: [] };
+
         const headers = lines[0].split(',').map(h => h.trim());
         const data = [];
+        const errors = []; // Array to hold error messages
+
         for (let i = 1; i < lines.length; i++) {
+            const lineNumber = i + 1;
             if (lines[i].trim() === '') continue;
+            
+            // Using the robust parser from before
             const values = [];
             let currentField = '';
             let inQuotes = false;
@@ -218,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             values.push(currentField.trim());
+            
             if (values.length === headers.length) {
                 const coinObject = {};
                 headers.forEach((header, index) => {
@@ -225,27 +258,51 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (value.startsWith('"') && value.endsWith('"')) { value = value.slice(1, -1); }
                     coinObject[header] = value;
                 });
+
+                // NEW: Validate silverWeight
+                const weight = parseFloat(coinObject.silverWeight);
+                if (isNaN(weight) || weight < 0) {
+                    errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${coinObject.silverWeight}". Skipping.`);
+                    continue; // Skip this coin
+                }
                 data.push(coinObject);
+            } else {
+                errors.push(`Line ${lineNumber}: Incorrect number of columns. Skipping.`);
             }
         }
-        return data;
+        return { data, errors }; // Return both data and errors
     }
 
+    // UPDATED: Now handles displaying errors
     async function loadApp() {
-        // This is a placeholder for your existing loadApp function
-        // Ensure you copy the full function from your working file
         try {
             const response = await fetch('coins.csv');
             if (!response.ok) throw new Error(`Could not find coins.csv: ${response.statusText}`);
+            
             const csvText = await response.text();
-            const flatCoins = parseCSV(csvText); // Make sure parseCSV is also copied
-            groupedCoins = groupCoinsByCountry(flatCoins);
+            const result = parseCSV(csvText); // Get the result object
+            
+            // NEW: Display any errors from the CSV
+            if (result.errors.length > 0) {
+                errorContainer.style.display = 'block';
+                let errorHTML = '<h3>Warning: Issues found in coins.csv</h3><ul>';
+                result.errors.forEach(err => {
+                    errorHTML += `<li>${err}</li>`;
+                });
+                errorHTML += '</ul>';
+                errorContainer.innerHTML = errorHTML;
+            } else {
+                errorContainer.style.display = 'none';
+            }
+
+            groupedCoins = groupCoinsByCountry(result.data); // Use the valid data
             renderCoins();
             loadQuantities();
             calculateTotals();
         } catch (error) {
-            console.error('Error loading or parsing CSV:', error);
-            coinListEl.innerHTML = '<p style="color: red;">Error: Could not load coin data. Check console for details.</p>';
+            console.error('Error loading application:', error);
+            errorContainer.style.display = 'block';
+            errorContainer.innerHTML = `<h3>Application Error</h3><p>${error.message}</p>`;
         }
     }
 
@@ -253,4 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTheme();
     updateGramFromToz();
     loadApp();
+
+    // NOTE: Make sure to copy the full, working functions for sections marked as unchanged
 });
