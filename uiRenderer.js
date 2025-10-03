@@ -18,14 +18,31 @@ export function renderCoins() {
             const coinKey = `${coin.country}-${coin.name}-${coin.date}`.replace(/\s/g, '_');
             const coinItem = document.createElement('div');
             coinItem.className = 'coin-item';
+
+            // --- UPDATED RENDERING LOGIC HERE ---
+            let coinNameHtml;
+            if (coin.numistaUrl && coin.numistaUrl.trim() !== '') {
+                // If numistaUrl exists, create a link
+                coinNameHtml = `
+                    <a href="${coin.numistaUrl}" target="_blank" rel="noopener noreferrer" class="coin-name-link">
+                        ${coin.name} ${coin.date} - (${coin.silverWeight} tOz)
+                    </a>
+                `;
+            } else {
+                // Otherwise, render as a plain span
+                coinNameHtml = `<span>${coin.name} ${coin.date} - (${coin.silverWeight} tOz)</span>`;
+            }
+
             coinItem.innerHTML = `
-                <span>${coin.name} ${coin.date} - (${coin.silverWeight} tOz)</span>
+                ${coinNameHtml}
                 <input type="number" class="coin-quantity" 
                        data-key="${coinKey}" 
                        data-silver-weight="${coin.silverWeight}"
                        min="0" value="0">
                 <span class="coin-subtotal">€0.00</span>
             `;
+            // --- END UPDATED RENDERING LOGIC ---
+
             detailsEl.appendChild(coinItem);
         });
         coinListEl.appendChild(detailsEl);

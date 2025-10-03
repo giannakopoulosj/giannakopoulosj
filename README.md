@@ -91,6 +91,7 @@ This file is the heart of your application. It must follow a specific format.
 | `name`         | The name of the coin. If the name includes a comma, it **must** be enclosed in double quotes.            | `Morgan Silver Dollar` or `"Florin, Circulated"` | Required.                                                |
 | `date`         | The year or date range of the coin. This is treated as text.                                            | `1916-1945`                    | Required.                                                |
 | `silverWeight` | The silver weight of a single coin in Troy Ounces (tOz).                                                | `0.773450`                     | **Required**. Must be a non-negative number. **Must have at least 6 decimal places for precision.** |
+| `numistaUrl`   | (Optional) A full URL to the coin's page on Numista. If empty, the coin name will not be clickable.     | `https://en.numista.com/...`   | Optional. Must be a valid URL format for best practice.  |
 
 **Example of Valid `coins.csv` content:**
 ```csv

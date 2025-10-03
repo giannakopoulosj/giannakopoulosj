@@ -10,8 +10,8 @@
     --header-bg-color: #f7f7f7;
     --danger-color: #d9534f;
     --danger-text-color: #d9534f;
-    /* Removed filtered-bg-color-light variable as it's no longer needed */
     --filtered-text-color-light: #e67e22; /* Orange text */
+    /* Removed --link-color-light as it's no longer needed */
 }
 
 body.dark-mode {
@@ -25,8 +25,8 @@ body.dark-mode {
     --header-bg-color: #212529;
     --danger-color: #dc3545;
     --danger-text-color: #dc3545;
-    /* Removed filtered-bg-color-dark variable as it's no longer needed */
     --filtered-text-color-dark: #f0c419; /* Yellowish orange text */
+    /* Removed --link-color-dark as it's no longer needed */
 }
 
 /* --- 2. GENERAL STYLES (using variables) --- */
@@ -80,10 +80,8 @@ input {
     margin-bottom: 25px;
 }
 
-/* UPDATED: Remove background and shadow for filtered state */
 .totals.filtered-active {
-    /* Only change the border color for a subtle distinction */
-    border-color: var(--filtered-text-color-light); /* Keeps the subtle border hint */
+    border-color: var(--filtered-text-color-light);
 }
 body.dark-mode .totals.filtered-active {
     border-color: var(--filtered-text-color-dark);
@@ -92,12 +90,12 @@ body.dark-mode .totals.filtered-active {
 .filtered-text {
     font-size: 0.9em;
     font-weight: bold;
-    color: var(--filtered-text-color-light); /* This color remains */
+    color: var(--filtered-text-color-light);
     margin-left: 5px;
     transition: color 0.3s;
 }
 body.dark-mode .filtered-text {
-    color: var(--filtered-text-color-dark); /* This color remains */
+    color: var(--filtered-text-color-dark);
 }
 
 
@@ -155,6 +153,20 @@ body.dark-mode .filtered-text {
 .coin-item > span:first-child { flex-grow: 1; margin-right: 10px; }
 .coin-item input { width: 60px; padding: 5px; text-align: center; }
 .coin-subtotal { font-weight: bold; min-width: 80px; text-align: right; color: var(--text-muted-color); }
+
+/* --- UPDATED LINK STYLING: Bold and normal text color --- */
+.coin-name-link {
+    color: var(--text-color); /* Use the standard text color */
+    text-decoration: none;
+    font-weight: bold; /* Make it bold as requested */
+    transition: color 0.2s;
+}
+.coin-name-link:hover {
+    text-decoration: underline; /* Still underline on hover for interaction cue */
+    color: var(--primary-color); /* Highlight with primary color on hover */
+}
+/* No need for a separate body.dark-mode .coin-name-link if we just use var(--text-color) */
+
 
 /* --- 4. THEME TOGGLE SWITCH STYLES --- */
 .theme-switch-wrapper { display: flex; align-items: center; }
