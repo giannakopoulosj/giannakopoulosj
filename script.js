@@ -4,23 +4,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const silverPriceTozEl = document.getElementById('silver-price-toz');
     const silverPriceGramEl = document.getElementById('silver-price-gram');
     const clearAllBtn = document.getElementById('clear-all-btn');
-    const searchInput = document.getElementById('search-input'); // Get the new search input
+    const searchInput = document.getElementById('search-input');
 
     // Data
     let groupedCoins = {};
     const TROY_OUNCE_IN_GRAMS = 31.1034768;
     const STORAGE_KEY = 'coinQuantities';
 
-    // --- NEW: Search Functionality ---
+    // --- Search Functionality ---
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
-
         document.querySelectorAll('.country-group').forEach(group => {
             let hasVisibleCoins = false;
-            
             group.querySelectorAll('.coin-item').forEach(item => {
                 const coinText = item.querySelector('span:first-child').textContent.toLowerCase();
-                
                 if (coinText.includes(query)) {
                     item.style.display = 'flex';
                     hasVisibleCoins = true;
@@ -29,21 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Show or hide the entire country group based on its contents
             if (hasVisibleCoins) {
                 group.style.display = 'block';
-                group.open = true; // Auto-expand groups with search results
+                group.open = true;
             } else {
                 group.style.display = 'none';
             }
 
-            // If the search query is empty, collapse all groups
             if (query === '') {
                 group.open = false;
             }
         });
     });
-
 
     // --- Save, Load, and Clear Functions ---
     function saveQuantities() {
@@ -110,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCoins() {
         coinListEl.innerHTML = '';
         const countries = Object.keys(groupedCoins).sort();
-
         countries.forEach(country => {
             const detailsEl = document.createElement('details');
             detailsEl.className = 'country-group';
@@ -118,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
             summaryEl.className = 'country-title';
             summaryEl.textContent = country;
             detailsEl.appendChild(summaryEl);
-
             groupedCoins[country].forEach(coin => {
                 const coinKey = `${coin.country}-${coin.name}-${coin.date}`.replace(/\s/g, '_');
                 const coinItem = document.createElement('div');
@@ -135,55 +127,86 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             coinListEl.appendChild(detailsEl);
         });
-
         document.querySelectorAll('.coin-quantity').forEach(input => {
             input.addEventListener('input', calculateTotals);
         });
     }
-    
+
     function calculateTotals() {
         const totalSilverWeightEl = document.querySelector('.total-silver-weight');
         const totalMeltValueEl = document.querySelector('.total-melt-value');
-        
         let grandTotalWeight = 0;
         const currentSilverPriceToz = parseFloat(silverPriceTozEl.value) || 0;
-
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const quantity = parseInt(input.value) || 0;
             const silverWeight = parseFloat(input.dataset.silverWeight);
-                
             const coinTotalWeight = silverWeight * quantity;
             const coinMeltValue = coinTotalWeight * currentSilverPriceToz;
             grandTotalWeight += coinTotalWeight;
-                
             const subtotalEl = input.nextElementSibling;
             if (subtotalEl) {
                 subtotalEl.textContent = `€${coinMeltValue.toFixed(2)}`;
             }
         });
-
         const grandMeltValue = grandTotalWeight * currentSilverPriceToz;
-
         if (totalSilverWeightEl) totalSilverWeightEl.textContent = grandTotalWeight.toFixed(3);
         if (totalMeltValueEl) totalMeltValueEl.textContent = grandMeltValue.toFixed(2);
-        
         saveQuantities();
     }
 
     // --- CSV Loading and Parsing ---
+    
+    // *** NEW, MORE ROBUST PARSER ***
     function parseCSV(text) {
         const lines = text.trim().split('\n');
         if (lines.length < 2) return [];
-        const headers = lines[0].split(',').map(header => header.trim());
+
+        const headers = lines[0].split(',').map(h => h.trim());
         const data = [];
+
         for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue;
-            const values = lines[i].split(',');
-            let coinObject = {};
-            headers.forEach((header, index) => {
-                coinObject[header] = values[index] ? values[index].trim() : '';
-            });
-            data.push(coinObject);
+
+            const values = [];
+            let currentField = '';
+            let inQuotes = false;
+
+            for (const char of lines[i]) {
+                if (char === '"' && inQuotes) {
+                    // This handles escaped quotes "" inside a quoted field
+                    const nextChar = lines[i][lines[i].indexOf(char) + 1];
+                    if (nextChar === '"') {
+                        currentField += '"';
+                        continue; // Skip the next quote
+                    }
+                }
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                    continue;
+                }
+
+                if (char === ',' && !inQuotes) {
+                    values.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            values.push(currentField.trim()); // Add the last field
+
+            if (values.length === headers.length) {
+                const coinObject = {};
+                headers.forEach((header, index) => {
+                    // Remove quotes from the start and end of the value if they exist
+                    let value = values[index];
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.slice(1, -1);
+                    }
+                    coinObject[header] = value;
+                });
+                data.push(coinObject);
+            }
         }
         return data;
     }
@@ -192,17 +215,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('coins.csv');
             if (!response.ok) throw new Error(`Could not find coins.csv: ${response.statusText}`);
-            
             const csvText = await response.text();
             const flatCoins = parseCSV(csvText);
             groupedCoins = groupCoinsByCountry(flatCoins);
-            
             renderCoins();
             loadQuantities();
             calculateTotals();
         } catch (error) {
             console.error('Error loading or parsing CSV:', error);
-            coinListEl.innerHTML = '<p style="color: red;">Error: Could not load coin data from coins.csv. Make sure the file exists and you are running a local server.</p>';
+            coinListEl.innerHTML = '<p style="color: red;">Error: Could not load coin data. Check console for details.</p>';
         }
     }
 
