@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TROY_OUNCE_IN_GRAMS = 31.1034768;
     const STORAGE_KEY = 'coinQuantities';
 
-    // --- Theme Management (RESTORED) ---
+    // --- Theme Management ---
     function applyTheme(theme) {
         if (theme === 'dark') {
             document.body.classList.add('dark-mode');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             themeToggle.checked = false;
         }
     }
-
+    
     function saveTheme(theme) {
         localStorage.setItem('theme', theme);
     }
@@ -36,18 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadTheme() {
         const savedTheme = localStorage.getItem('theme');
-        // If a theme is saved in local storage, use it.
-        // Otherwise, default to 'dark'.
         if (savedTheme) {
             applyTheme(savedTheme);
         } else {
             applyTheme('dark');
         }
     }
-    // --- Search Functionality (UPGRADED) ---
+
+    // --- Search Functionality (UPDATED) ---
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
-        const searchWords = query.split(' ').filter(word => word.length > 0); // Split query into individual words
+        const searchWords = query.split(' ').filter(word => word.length > 0);
 
         document.querySelectorAll('.country-group').forEach(group => {
             const countryName = group.querySelector('.country-title').textContent.toLowerCase();
@@ -55,10 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             group.querySelectorAll('.coin-item').forEach(item => {
                 const coinText = item.querySelector('span:first-child').textContent.toLowerCase();
-                // Combine country and coin info for a complete search target
-                const searchableText = `${countryName} ${coinText}`;
+                const searchableText = `${countryName} ${coinText}`; // Combine for comprehensive search
 
-                // Check if the combined text includes EVERY word from the search query
                 const isMatch = searchWords.every(word => searchableText.includes(word));
 
                 if (isMatch) {
@@ -71,18 +68,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (hasVisibleCoins) {
                 group.style.display = 'block';
-                group.open = true;
+                group.open = true; // Auto-expand when there are matches
             } else {
                 group.style.display = 'none';
             }
-
-            // If the search bar is cleared, collapse all groups
+            
+            // If the search bar is cleared, collapse groups but keep them visible
             if (query === '') {
                 group.open = false;
+                group.style.display = 'block'; // Ensure group container is visible even if collapsed
             }
         });
-    });
 
+        // IMPORTANT: Always recalculate totals after a search filter changes
+        // This ensures the displayed totals reflect only the visible coins.
+        calculateTotals();
+    });
 
     // --- Save, Load, and Clear Functions ---
     function saveQuantities() {
@@ -117,25 +118,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Price Synchronization & VALIDATION ---
+    // --- Price Synchronization & Validation ---
     function updateGramFromToz() {
         let tozPrice = parseFloat(silverPriceTozEl.value) || 0;
-        // NEW: Validate for negative values
         if (tozPrice < 0) {
             tozPrice = 0;
             silverPriceTozEl.value = '0';
         }
         silverPriceGramEl.value = (tozPrice / TROY_OUNCE_IN_GRAMS).toFixed(4);
     }
-
     silverPriceTozEl.addEventListener('input', () => {
         updateGramFromToz();
         calculateTotals();
     });
-
     silverPriceGramEl.addEventListener('input', () => {
         let gramPrice = parseFloat(silverPriceGramEl.value) || 0;
-        // NEW: Validate for negative values
         if (gramPrice < 0) {
             gramPrice = 0;
             silverPriceGramEl.value = '0';
@@ -144,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateTotals();
     });
 
-    // --- Core Functions (Implement the full functions from your working file) ---
+    // --- Core Functions ---
     function groupCoinsByCountry(flatCoinList) {
         const groups = {};
         flatCoinList.forEach(coin => {
@@ -187,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- calculateTotals (UPDATED for visible items only) ---
     function calculateTotals() {
         const totalSilverWeightEl = document.querySelector('.total-silver-weight');
         const totalMeltValueEl = document.querySelector('.total-melt-value');
@@ -194,45 +192,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentSilverPriceToz = parseFloat(silverPriceTozEl.value) || 0;
 
         document.querySelectorAll('.coin-quantity').forEach(input => {
-            let quantity = parseInt(input.value) || 0;
+            const coinItem = input.closest('.coin-item');
+            // Only include visible coin items in the grand total calculation
+            if (coinItem && coinItem.style.display === 'none') {
+                // For hidden items, reset their individual subtotal to 0 and skip for grand totals
+                const subtotalEl = input.nextElementSibling;
+                if (subtotalEl) {
+                    subtotalEl.textContent = `€0.00`;
+                }
+                return; // Skip this hidden input for grand totals
+            }
 
-            // NEW: Validate for negative quantities
+            let quantity = parseInt(input.value) || 0;
             if (quantity < 0) {
                 quantity = 0;
                 input.value = '0';
             }
 
-            if (input.offsetParent === null) return;
             const silverWeight = parseFloat(input.dataset.silverWeight);
             const coinTotalWeight = silverWeight * quantity;
             const coinMeltValue = coinTotalWeight * currentSilverPriceToz;
             grandTotalWeight += coinTotalWeight;
+
             const subtotalEl = input.nextElementSibling;
             if (subtotalEl) {
                 subtotalEl.textContent = `€${coinMeltValue.toFixed(2)}`;
             }
         });
+
         const grandMeltValue = grandTotalWeight * currentSilverPriceToz;
         if (totalSilverWeightEl) totalSilverWeightEl.textContent = grandTotalWeight.toFixed(3);
         if (totalMeltValueEl) totalMeltValueEl.textContent = grandMeltValue.toFixed(2);
-        saveQuantities();
+        
+        saveQuantities(); // Always save quantities, whether visible or not.
     }
 
     function parseCSV(text) {
         const lines = text.trim().split('\n');
         if (lines.length < 2) return { data: [], errors: [] };
-
         const headers = lines[0].split(',').map(h => h.trim());
         const data = [];
         const errors = [];
-
         for (let i = 1; i < lines.length; i++) {
             const lineNumber = i + 1;
             if (lines[i].trim() === '') continue;
-
-            // Using the robust parser from before
             const values = [];
-            // (Your robust parsing logic to populate 'values' goes here)
             let currentField = '', inQuotes = false;
             for (const char of lines[i]) {
                 if (char === '"' && inQuotes && lines[i][lines[i].indexOf(char) + 1] === '"') {
@@ -246,8 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             values.push(currentField.trim());
-
-
             if (values.length === headers.length) {
                 const coinObject = {};
                 headers.forEach((header, index) => {
@@ -255,22 +257,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (value.startsWith('"') && value.endsWith('"')) { value = value.slice(1, -1); }
                     coinObject[header] = value;
                 });
-
-                // --- NEW VALIDATION LOGIC ---
                 const weightString = coinObject.silverWeight || '';
                 const weight = parseFloat(weightString);
                 const decimalPart = weightString.split('.')[1] || '';
-
                 if (isNaN(weight) || weight < 0) {
                     errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${weightString}". Skipping.`);
-                    continue; // Skip due to invalid number
+                    continue;
                 }
-
                 if (decimalPart.length < 6) {
                     errors.push(`Line ${lineNumber}: Invalid precision for coin "${coinObject.name}". Weight must have at least 6 decimal places (e.g., 0.123456). Skipping.`);
-                    continue; // Skip due to insufficient precision
+                    continue;
                 }
-
                 data.push(coinObject);
             } else {
                 errors.push(`Line ${lineNumber}: Incorrect number of columns. Skipping.`);
@@ -279,15 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return { data, errors };
     }
 
-    // UPDATED: No changes here, but it will now display the new precision errors
     async function loadApp() {
         try {
             const response = await fetch('coins.csv');
             if (!response.ok) throw new Error(`Could not find coins.csv: ${response.statusText}`);
-
             const csvText = await response.text();
             const result = parseCSV(csvText);
-
             if (result.errors.length > 0) {
                 errorContainer.style.display = 'block';
                 let errorHTML = '<h3>Warning: Issues found in coins.csv</h3><ul>';
@@ -297,11 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 errorContainer.style.display = 'none';
             }
-
             groupedCoins = groupCoinsByCountry(result.data);
             renderCoins();
             loadQuantities();
-            calculateTotals();
+            calculateTotals(); // Initial calculation after loading quantities
         } catch (error) {
             console.error('Error loading application:', error);
             errorContainer.style.display = 'block';
@@ -309,11 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     // --- Initial Load ---
     loadTheme();
     updateGramFromToz();
     loadApp();
-
-    // NOTE: Make sure to copy the full, working functions for sections marked as unchanged
 });
