@@ -160,3 +160,21 @@ input:checked + .slider:before { transform: translateX(24px); }
     font-size: 0.85em;
     color: var(--text-muted-color);
 }
+
+.app-footer p {
+    margin-bottom: 1rem; /* Add some space between disclaimer and link */
+}
+
+/* New style for the GitHub link */
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text-muted-color);
+    transition: color 0.2s;
+}
+
+.github-link:hover {
+    color: var(--primary-color);
+}

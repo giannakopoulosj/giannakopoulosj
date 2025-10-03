@@ -110,3 +110,16 @@ UK,"Shilling, 92.5% Silver",1902-1919,0.168200
 > The spot price of silver is volatile and fluctuates constantly. The prices used in this calculator may not be real-time or accurate. All data, especially the silver weights in the `coins.csv` file, should be independently verified by the user.
 >
 > The author and contributors are not liable for any errors, inaccuracies, financial losses, or damages of any kind resulting from the use of this software. **Use at your own risk.**
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you have ideas for new features, improvements, or have found a bug, please feel free to:
+
+1.  [Open an issue]([https://github.com/giannakopoulosj/giannakopoulosj.github.io]/issues) to discuss what you would like to change.
+2.  Fork the repository and create a new branch (`git checkout -b feature/AmazingFeature`).
+3.  Make your changes.
+4.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+5.  Push to the branch (`git push origin feature/AmazingFeature`).
+6.  [Open a Pull Request]([https://github.com/giannakopoulosj/giannakopoulosj.github.io]/pulls).
