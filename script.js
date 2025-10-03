@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const silverPriceGramEl = document.getElementById('silver-price-gram');
     const clearAllBtn = document.getElementById('clear-all-btn');
     const searchInput = document.getElementById('search-input');
+    const clearSearchBtn = document.getElementById('clear-search-btn'); // Correctly referenced
     const themeToggle = document.getElementById('theme-toggle');
 
     // Data
@@ -43,10 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Search Functionality (UPDATED) ---
-    searchInput.addEventListener('input', () => {
+    // --- Search Functionality (FIXED AND UPDATED) ---
+
+    // Define filterCoins function once, at the top level
+    function filterCoins() {
         const query = searchInput.value.toLowerCase().trim();
         const searchWords = query.split(' ').filter(word => word.length > 0);
+
+        // Show/hide clear search button based on query length
+        if (query.length > 0) {
+            clearSearchBtn.style.display = 'block';
+        } else {
+            clearSearchBtn.style.display = 'none';
+        }
 
         document.querySelectorAll('.country-group').forEach(group => {
             const countryName = group.querySelector('.country-title').textContent.toLowerCase();
@@ -54,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             group.querySelectorAll('.coin-item').forEach(item => {
                 const coinText = item.querySelector('span:first-child').textContent.toLowerCase();
-                const searchableText = `${countryName} ${coinText}`; // Combine for comprehensive search
+                const searchableText = `${countryName} ${coinText}`;
 
                 const isMatch = searchWords.every(word => searchableText.includes(word));
 
@@ -68,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (hasVisibleCoins) {
                 group.style.display = 'block';
-                group.open = true; // Auto-expand when there are matches
+                group.open = true;
             } else {
                 group.style.display = 'none';
             }
@@ -76,13 +86,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // If the search bar is cleared, collapse groups but keep them visible
             if (query === '') {
                 group.open = false;
-                group.style.display = 'block'; // Ensure group container is visible even if collapsed
+                group.style.display = 'block';
             }
         });
+        calculateTotals(); // Recalculate totals based on visible items
+    }
 
-        // IMPORTANT: Always recalculate totals after a search filter changes
-        // This ensures the displayed totals reflect only the visible coins.
-        calculateTotals();
+    // Attach event listener to search input to call filterCoins
+    searchInput.addEventListener('input', filterCoins);
+
+    // Event listener for the clear search button
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = ''; // Clear the input field
+        filterCoins();          // Re-run the filter to show all coins and hide the button
+        searchInput.focus();    // Put focus back on the search input
     });
 
     // --- Save, Load, and Clear Functions ---
@@ -184,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- calculateTotals (UPDATED for visible items only) ---
     function calculateTotals() {
         const totalSilverWeightEl = document.querySelector('.total-silver-weight');
         const totalMeltValueEl = document.querySelector('.total-melt-value');
@@ -193,14 +209,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const coinItem = input.closest('.coin-item');
-            // Only include visible coin items in the grand total calculation
             if (coinItem && coinItem.style.display === 'none') {
-                // For hidden items, reset their individual subtotal to 0 and skip for grand totals
                 const subtotalEl = input.nextElementSibling;
                 if (subtotalEl) {
                     subtotalEl.textContent = `€0.00`;
                 }
-                return; // Skip this hidden input for grand totals
+                return;
             }
 
             let quantity = parseInt(input.value) || 0;
@@ -224,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalSilverWeightEl) totalSilverWeightEl.textContent = grandTotalWeight.toFixed(3);
         if (totalMeltValueEl) totalMeltValueEl.textContent = grandMeltValue.toFixed(2);
         
-        saveQuantities(); // Always save quantities, whether visible or not.
+        saveQuantities();
     }
 
     function parseCSV(text) {
@@ -295,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCoins();
             loadQuantities();
             calculateTotals(); // Initial calculation after loading quantities
+            filterCoins(); // Initial filter call to ensure clear button state is correct
         } catch (error) {
             console.error('Error loading application:', error);
             errorContainer.style.display = 'block';

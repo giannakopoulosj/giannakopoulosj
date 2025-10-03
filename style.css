@@ -90,7 +90,41 @@ input {
 }
 .clear-button:hover { background-color: var(--danger-color); color: #fff; }
 
-#search-input { width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box; }
+/* IMPORTANT: .search-container must be relative for absolute positioning of the button */
+.search-container {
+    margin-bottom: 25px;
+    position: relative; /* This is the key */
+}
+
+#search-input {
+    width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box;
+    padding-right: 40px; /* Add extra padding to make space for the button */
+}
+
+/* Styles for the clear search button */
+.clear-search-button {
+    position: absolute;
+    right: 10px; /* Position from the right edge of the container */
+    top: 50%;
+    transform: translateY(-50%); /* Vertically center the button */
+    background: none;
+    border: none;
+    color: var(--text-muted-color); /* Matches muted text color */
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0 5px;
+    transition: color 0.2s;
+    line-height: 1; /* Ensures the 'x' is vertically centered within the button */
+    height: 1.5em; /* Explicit height helps with vertical alignment */
+    width: 1.5em; /* Explicit width */
+    display: flex; /* Use flex to center the X if it's an SVG */
+    align-items: center;
+    justify-content: center;
+}
+
+.clear-search-button:hover {
+    color: var(--primary-color);
+}
 
 .country-group { border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 15px; }
 .country-title {
@@ -131,26 +165,6 @@ input {
 input:checked + .slider { background-color: var(--primary-color); }
 input:checked + .slider:before { transform: translateX(24px); }
 
-/* Add this new style for the error message box */
-.error-box {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid var(--danger-color);
-    background-color: rgba(220, 53, 69, 0.1); /* transparent red */
-    color: var(--danger-text-color);
-    border-radius: 5px;
-}
-
-.error-box h3 {
-    margin-top: 0;
-    color: var(--danger-color);
-}
-
-.error-box ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
 /* --- 5. FOOTER STYLES --- */
 .app-footer {
     margin-top: 30px;
@@ -162,10 +176,9 @@ input:checked + .slider:before { transform: translateX(24px); }
 }
 
 .app-footer p {
-    margin-bottom: 1rem; /* Add some space between disclaimer and link */
+    margin-bottom: 1rem;
 }
 
-/* New style for the GitHub link */
 .github-link {
     display: inline-flex;
     align-items: center;
