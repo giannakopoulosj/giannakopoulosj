@@ -80,7 +80,7 @@ Because modern browsers restrict local file access for security reasons, you can
 
 This file is the heart of your application. It must follow a specific format.
 
-- The first line **must** be the header: `country,name,date,silverWeight`
+- The first line **must** contain these header names (order is flexible): `country,name,date,silverWeight,numistaUrl`
 - Each subsequent line represents a single type of coin.
 
 #### Column Descriptions:

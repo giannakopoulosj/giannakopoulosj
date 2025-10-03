@@ -1,16 +1,16 @@
 country,name,date,silverWeight,numistaUrl
-USA,Mercury Dime (90% Silver),1916-1945,0.072339,
-USA,Roosevelt Dime (90% Silver),1946-1964,0.072339,
-USA,Standing Liberty Quarter (90% Silver),1916-1930,0.180850,
-USA,Washington Quarter (90% Silver),1932-1964,0.180850,
-USA,Walking Liberty Half Dollar (90% Silver),1916-1947,0.361700,
-USA,Franklin Half Dollar (90% Silver),1948-1963,0.361700,
-USA,Kennedy Half Dollar (90% Silver),1964-1964,0.361700,
-USA,Kennedy Half Dollar (40% Silver),1965-1970,0.147890
+USA,Mercury Dime (90% Silver),1916-1945,0.072339,https://en.numista.com/51
+USA,Roosevelt Dime (90% Silver),1946-1964,0.072339,https://en.numista.com/52
+USA,Standing Liberty Quarter (90% Silver),1916-1930,0.180850,https://en.numista.com/30785
+USA,Washington Quarter (90% Silver),1932-1964,0.180850,https://en.numista.com/55
+USA,Walking Liberty Half Dollar (90% Silver),1916-1947,0.361700,https://en.numista.com/4455
+USA,Franklin Half Dollar (90% Silver),1948-1963,0.361700,https://en.numista.com/2835
+USA,Kennedy Half Dollar (90% Silver),1964-1964,0.361700,https://en.numista.com/943
+USA,Kennedy Half Dollar (40% Silver),1965-1970,0.147890,https://en.numista.com/10865
 USA,Morgan Silver Dollar (90% Silver),1878-1921,0.773450,https://en.numista.com/1492
-USA,Peace Silver Dollar (90% Silver),1921-1935,0.773450,
-USA,American Silver Eagle (99.9% Silver),1986-Present,1.000000,
-Austria,"1 Corona https://en.numista.com/5744",1901-1916,0.1342314246214192,
+USA,Peace Silver Dollar (90% Silver),1921-1935,0.773450,https://en.numista.com/5580
+USA,American Silver Eagle (99.9% Silver),1986-Present,1.000000,https://en.numista.com/1493
+Austria,"1 Corona",1901-1916,0.1342314246214192,
 Austria,2 Corona,1912-1913,0.268500,
 Austria,5 Corona,1907-1909,0.644300,
 Austria,Maria Theresa Thaler,Various,0.751700,
