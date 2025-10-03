@@ -36,16 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadTheme() {
         const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // If a theme is saved in local storage, use it.
+        // Otherwise, default to 'dark'.
         if (savedTheme) {
             applyTheme(savedTheme);
-        } else if (systemPrefersDark) {
-            applyTheme('dark');
         } else {
-            applyTheme('light');
+            applyTheme('dark');
         }
     }
-
     // --- Search Functionality (UPGRADED) ---
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
@@ -313,17 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Initial Load ---
-function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-
-    // If a theme is saved in local storage, use it.
-    // Otherwise, default to 'dark'.
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else {
-        applyTheme('dark');
-    }
-}
+    loadTheme();
     updateGramFromToz();
     loadApp();
 
