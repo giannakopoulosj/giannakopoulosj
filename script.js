@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             themeToggle.checked = false;
         }
     }
-    
+
     function saveTheme(theme) {
         localStorage.setItem('theme', theme);
     }
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.coin-quantity').forEach(input => {
             let quantity = parseInt(input.value) || 0;
-            
+
             // NEW: Validate for negative quantities
             if (quantity < 0) {
                 quantity = 0;
@@ -267,12 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${weightString}". Skipping.`);
                     continue; // Skip due to invalid number
                 }
-                
+
                 if (decimalPart.length < 6) {
                     errors.push(`Line ${lineNumber}: Invalid precision for coin "${coinObject.name}". Weight must have at least 6 decimal places (e.g., 0.123456). Skipping.`);
                     continue; // Skip due to insufficient precision
                 }
-                
+
                 data.push(coinObject);
             } else {
                 errors.push(`Line ${lineNumber}: Incorrect number of columns. Skipping.`);
@@ -286,10 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('coins.csv');
             if (!response.ok) throw new Error(`Could not find coins.csv: ${response.statusText}`);
-            
+
             const csvText = await response.text();
             const result = parseCSV(csvText);
-            
+
             if (result.errors.length > 0) {
                 errorContainer.style.display = 'block';
                 let errorHTML = '<h3>Warning: Issues found in coins.csv</h3><ul>';
