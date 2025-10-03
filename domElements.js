@@ -1,0 +1,12 @@
+export const errorContainer = document.getElementById('error-container');
+export const coinListEl = document.getElementById('coin-list');
+export const silverPriceTozEl = document.getElementById('silver-price-toz');
+export const silverPriceGramEl = document.getElementById('silver-price-gram');
+export const clearAllBtn = document.getElementById('clear-all-btn');
+export const searchInput = document.getElementById('search-input');
+export const clearSearchBtn = document.getElementById('clear-search-btn');
+export const themeToggle = document.getElementById('theme-toggle');
+export const totalsSection = document.getElementById('totals-section');
+export const filteredIndicator = document.getElementById('filtered-indicator');
+export const totalSilverWeightEl = document.querySelector('.total-silver-weight');
+export const totalMeltValueEl = document.querySelector('.total-melt-value');
