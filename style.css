@@ -10,7 +10,7 @@
     --header-bg-color: #f7f7f7;
     --danger-color: #d9534f;
     --danger-text-color: #d9534f;
-    --filtered-bg-color-light: #fef1e2; /* Light orange tint */
+    /* Removed filtered-bg-color-light variable as it's no longer needed */
     --filtered-text-color-light: #e67e22; /* Orange text */
 }
 
@@ -25,7 +25,7 @@ body.dark-mode {
     --header-bg-color: #212529;
     --danger-color: #dc3545;
     --danger-text-color: #dc3545;
-    --filtered-bg-color-dark: #4d4432; /* Darker orange tint */
+    /* Removed filtered-bg-color-dark variable as it's no longer needed */
     --filtered-text-color-dark: #f0c419; /* Yellowish orange text */
 }
 
@@ -80,27 +80,24 @@ input {
     margin-bottom: 25px;
 }
 
-/* NEW: Styles for when totals are filtered */
+/* UPDATED: Remove background and shadow for filtered state */
 .totals.filtered-active {
-    background-color: var(--filtered-bg-color-light);
-    border-color: var(--filtered-text-color-light);
-    box-shadow: 0 0 8px rgba(230, 126, 34, 0.4); /* Subtle glow */
+    /* Only change the border color for a subtle distinction */
+    border-color: var(--filtered-text-color-light); /* Keeps the subtle border hint */
 }
 body.dark-mode .totals.filtered-active {
-    background-color: var(--filtered-bg-color-dark);
     border-color: var(--filtered-text-color-dark);
-    box-shadow: 0 0 8px rgba(240, 196, 25, 0.4);
 }
 
 .filtered-text {
     font-size: 0.9em;
     font-weight: bold;
-    color: var(--filtered-text-color-light);
+    color: var(--filtered-text-color-light); /* This color remains */
     margin-left: 5px;
     transition: color 0.3s;
 }
 body.dark-mode .filtered-text {
-    color: var(--filtered-text-color-dark);
+    color: var(--filtered-text-color-dark); /* This color remains */
 }
 
 
