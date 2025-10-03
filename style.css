@@ -13,37 +13,40 @@
 }
 
 body.dark-mode {
-    --bg-color: #121212;
-    --surface-color: #1e1e1e;
-    --text-color: #e0e0e0;
-    --text-muted-color: #a0a0a0;
+    --bg-color: #212529;
+    --surface-color: #343a40;
+    --text-color: #f8f9fa;
+    --text-muted-color: #adb5bd;
     --primary-color: #58a6ff;
-    --border-color: #333333;
-    --input-bg-color: #2c2c2c;
-    --header-bg-color: #252525;
-    --danger-color: #f85149;
-    --danger-text-color: #f85149;
+    --border-color: #495057;
+    --input-bg-color: #495057;
+    --header-bg-color: #212529;
+    --danger-color: #dc3545;
+    --danger-text-color: #dc3545;
 }
 
 /* --- 2. GENERAL STYLES (using variables) --- */
 body {
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    margin: 0;
+    padding: 2rem 0;
     transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
-    width: 80%;
-    max-width: 900px;
-    margin: auto;
-    overflow: hidden;
-    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
     background: var(--surface-color);
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s, border-color 0.3s;
+    box-sizing: border-box;
 }
 
 .header {
@@ -51,13 +54,13 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
 }
 
-h1, h2 {
-    color: var(--primary-color);
-}
+h1 { font-size: 1.75rem; margin: 0; }
+h2 { font-size: 1.25rem; }
+h1, h2 { color: var(--primary-color); }
 
 input {
     background-color: var(--input-bg-color);
@@ -70,42 +73,26 @@ input {
 
 /* --- 3. COMPONENT STYLES --- */
 .totals, .silver-price, .search-container, .coin-list {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .silver-price .price-input-group {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
+    margin-bottom: 10px; display: flex; align-items: center;
 }
-
-.silver-price label {
-    margin-right: 10px;
-    min-width: 180px;
-}
+.silver-price label { margin-right: 10px; min-width: 180px; }
 
 .clear-button {
-    display: block; width: 100%; padding: 10px; margin-top: 15px;
-    font-size: 1em; font-weight: bold; color: var(--danger-text-color);
-    background-color: transparent; border: 1px solid var(--danger-color);
-    border-radius: 5px; cursor: pointer; transition: background-color 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 10px; margin-top: 15px; font-size: 1em; font-weight: bold;
+    color: var(--danger-text-color); background-color: transparent;
+    border: 1px solid var(--danger-color); border-radius: 5px; cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
 }
+.clear-button:hover { background-color: var(--danger-color); color: #fff; }
 
-.clear-button:hover {
-    background-color: var(--danger-color);
-    color: var(--surface-color);
-}
+#search-input { width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box; }
 
-#search-input {
-    width: 100%; padding: 12px; font-size: 1.1em; box-sizing: border-box;
-}
-
-.country-group {
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-
+.country-group { border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 15px; }
 .country-title {
     font-size: 1.5em; font-weight: bold; padding: 15px; cursor: pointer;
     background-color: var(--header-bg-color); color: var(--primary-color);
@@ -121,7 +108,6 @@ input {
     border-bottom: 1px solid var(--border-color);
 }
 .coin-item:last-child { border-bottom: none; }
-
 .coin-item > span:first-child { flex-grow: 1; margin-right: 10px; }
 .coin-item input { width: 60px; padding: 5px; text-align: center; }
 .coin-subtotal { font-weight: bold; min-width: 80px; text-align: right; color: var(--text-muted-color); }
@@ -130,7 +116,17 @@ input {
 .theme-switch-wrapper { display: flex; align-items: center; }
 .theme-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
 .theme-switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+.slider {
+    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc; transition: .4s; border-radius: 26px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 5px;
+}
+.slider:before {
+    position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
+    background-color: white; transition: .4s; border-radius: 50%; z-index: 2;
+}
+.slider svg { height: 14px; width: 14px; z-index: 1; }
+.slider .sun-icon { color: #f39c12; }
+.slider .moon-icon { color: #f1c40f; }
 input:checked + .slider { background-color: var(--primary-color); }
 input:checked + .slider:before { transform: translateX(24px); }
