@@ -11,7 +11,6 @@
     --danger-color: #d9534f;
     --danger-text-color: #d9534f;
     --filtered-text-color-light: #e67e22; /* Orange text */
-    /* Removed --link-color-light as it's no longer needed */
 }
 
 body.dark-mode {
@@ -26,7 +25,6 @@ body.dark-mode {
     --danger-color: #dc3545;
     --danger-text-color: #dc3545;
     --filtered-text-color-dark: #f0c419; /* Yellowish orange text */
-    /* Removed --link-color-dark as it's no longer needed */
 }
 
 /* --- 2. GENERAL STYLES (using variables) --- */
@@ -66,14 +64,17 @@ h1 { font-size: 1.75rem; margin: 0; }
 h2 { font-size: 1.25rem; }
 h1, h2 { color: var(--primary-color); }
 
-input {
+input[type="text"],
+input[type="number"] {
     background-color: var(--input-bg-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
     border-radius: 5px;
     padding: 8px;
     font-size: 1em;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
+
 
 /* --- 3. COMPONENT STYLES --- */
 .totals, .silver-price, .search-container, .coin-list {
@@ -150,22 +151,33 @@ body.dark-mode .filtered-text {
     border-bottom: 1px solid var(--border-color);
 }
 .coin-item:last-child { border-bottom: none; }
-.coin-item > span:first-child { flex-grow: 1; margin-right: 10px; }
-.coin-item input { width: 60px; padding: 5px; text-align: center; }
+
+/* --- FIX FOR ALIGNMENT: Target any first child --- */
+.coin-item > *:first-child { /* Target any first child element (span or a) */
+    flex-grow: 1;
+    margin-right: 10px;
+}
+/* Ensure coin-quantity input is properly styled */
+.coin-item input.coin-quantity {
+    width: 60px;
+    padding: 5px;
+    text-align: center;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
 .coin-subtotal { font-weight: bold; min-width: 80px; text-align: right; color: var(--text-muted-color); }
 
-/* --- UPDATED LINK STYLING: Bold and normal text color --- */
 .coin-name-link {
-    color: var(--text-color); /* Use the standard text color */
+    color: var(--text-color);
     text-decoration: none;
-    font-weight: bold; /* Make it bold as requested */
+    font-weight: bold;
     transition: color 0.2s;
 }
 .coin-name-link:hover {
-    text-decoration: underline; /* Still underline on hover for interaction cue */
-    color: var(--primary-color); /* Highlight with primary color on hover */
+    text-decoration: underline;
+    color: var(--primary-color);
 }
-/* No need for a separate body.dark-mode .coin-name-link if we just use var(--text-color) */
 
 
 /* --- 4. THEME TOGGLE SWITCH STYLES --- */
