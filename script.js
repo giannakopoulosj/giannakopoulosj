@@ -12,39 +12,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const TROY_OUNCE_IN_GRAMS = 31.1034768;
     const STORAGE_KEY = 'coinQuantities';
 
-    // --- Theme Management ---
-    function applyTheme(theme) { /* ... no changes ... */ }
-    function saveTheme(theme) { /* ... no changes ... */ }
-    themeToggle.addEventListener('change', () => { /* ... no changes ... */ });
-    function loadTheme() { /* ... no changes ... */ }
+    // --- Theme Management (RESTORED) ---
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeToggle.checked = false;
+        }
+    }
+    
+    function saveTheme(theme) {
+        localStorage.setItem('theme', theme);
+    }
 
+    themeToggle.addEventListener('change', () => {
+        const newTheme = themeToggle.checked ? 'dark' : 'light';
+        applyTheme(newTheme);
+        saveTheme(newTheme);
+    });
 
-    // *** UPDATED SEARCH FUNCTIONALITY ***
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else if (systemPrefersDark) {
+            applyTheme('dark');
+        } else {
+            applyTheme('light');
+        }
+    }
+
+    // --- Search Functionality (UPGRADED) ---
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase().trim();
+        const searchWords = query.split(' ').filter(word => word.length > 0); // Split query into individual words
 
-        // Loop through each country group (<details> element)
         document.querySelectorAll('.country-group').forEach(group => {
             const countryName = group.querySelector('.country-title').textContent.toLowerCase();
             let hasVisibleCoins = false;
 
-            // Check if the country name itself matches the search query
-            const countryMatchesQuery = countryName.includes(query);
-
-            // Loop through each coin item within the group
             group.querySelectorAll('.coin-item').forEach(item => {
                 const coinText = item.querySelector('span:first-child').textContent.toLowerCase();
+                // Combine country and coin info for a complete search target
+                const searchableText = `${countryName} ${coinText}`;
 
-                // A coin is visible if ITS text matches, OR if its COUNTRY'S name matches
-                if (coinText.includes(query) || countryMatchesQuery) {
+                // Check if the combined text includes EVERY word from the search query
+                const isMatch = searchWords.every(word => searchableText.includes(word));
+
+                if (isMatch) {
                     item.style.display = 'flex';
-                    hasVisibleCoins = true; // Mark this group as having something to show
+                    hasVisibleCoins = true;
                 } else {
                     item.style.display = 'none';
                 }
             });
 
-            // If the group has any visible coins, show the whole group and expand it
             if (hasVisibleCoins) {
                 group.style.display = 'block';
                 group.open = true;
@@ -61,33 +86,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Save, Load, and Clear Functions ---
-    // (This section remains unchanged)
     function saveQuantities() {
         const quantities = {};
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const key = input.dataset.key;
             const quantity = input.value;
-            if (quantity && parseInt(quantity) > 0) { quantities[key] = quantity; }
+            if (quantity && parseInt(quantity) > 0) {
+                quantities[key] = quantity;
+            }
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(quantities));
     }
+
     function loadQuantities() {
         const savedQuantities = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
         document.querySelectorAll('.coin-quantity').forEach(input => {
             const key = input.dataset.key;
-            if (savedQuantities[key]) { input.value = savedQuantities[key]; }
+            if (savedQuantities[key]) {
+                input.value = savedQuantities[key];
+            }
         });
     }
+
     clearAllBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to clear all coin quantities?')) {
-            document.querySelectorAll('.coin-quantity').forEach(input => { input.value = '0'; });
+            document.querySelectorAll('.coin-quantity').forEach(input => {
+                input.value = '0';
+            });
             localStorage.removeItem(STORAGE_KEY);
             calculateTotals();
         }
     });
 
     // --- Price Synchronization ---
-    // (This section remains unchanged)
     function updateGramFromToz() {
         const tozPrice = parseFloat(silverPriceTozEl.value) || 0;
         silverPriceGramEl.value = (tozPrice / TROY_OUNCE_IN_GRAMS).toFixed(4);
@@ -148,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let grandTotalWeight = 0;
         const currentSilverPriceToz = parseFloat(silverPriceTozEl.value) || 0;
         document.querySelectorAll('.coin-quantity').forEach(input => {
-            if (input.offsetParent === null) return; // Don't include hidden items in calculation (optional but good practice)
+            if (input.offsetParent === null) return;
             const quantity = parseInt(input.value) || 0;
             const silverWeight = parseFloat(input.dataset.silverWeight);
             const coinTotalWeight = silverWeight * quantity;
@@ -165,55 +196,33 @@ document.addEventListener('DOMContentLoaded', () => {
         saveQuantities();
     }
 
-    // --- CSV Loading and Parsing ---
-    
-    // *** NEW, MORE ROBUST PARSER ***
     function parseCSV(text) {
         const lines = text.trim().split('\n');
         if (lines.length < 2) return [];
-
         const headers = lines[0].split(',').map(h => h.trim());
         const data = [];
-
         for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue;
-
             const values = [];
             let currentField = '';
             let inQuotes = false;
-
             for (const char of lines[i]) {
-                if (char === '"' && inQuotes) {
-                    // This handles escaped quotes "" inside a quoted field
-                    const nextChar = lines[i][lines[i].indexOf(char) + 1];
-                    if (nextChar === '"') {
-                        currentField += '"';
-                        continue; // Skip the next quote
-                    }
+                if (char === '"' && inQuotes && lines[i][lines[i].indexOf(char) + 1] === '"') {
+                    currentField += '"'; continue;
                 }
-                
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                    continue;
-                }
-
+                if (char === '"') { inQuotes = !inQuotes; continue; }
                 if (char === ',' && !inQuotes) {
-                    values.push(currentField.trim());
-                    currentField = '';
+                    values.push(currentField.trim()); currentField = '';
                 } else {
                     currentField += char;
                 }
             }
-            values.push(currentField.trim()); // Add the last field
-
+            values.push(currentField.trim());
             if (values.length === headers.length) {
                 const coinObject = {};
                 headers.forEach((header, index) => {
-                    // Remove quotes from the start and end of the value if they exist
                     let value = values[index];
-                    if (value.startsWith('"') && value.endsWith('"')) {
-                        value = value.slice(1, -1);
-                    }
+                    if (value.startsWith('"') && value.endsWith('"')) { value = value.slice(1, -1); }
                     coinObject[header] = value;
                 });
                 data.push(coinObject);
@@ -240,17 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Initial Load (Copy your full initial load section) ---
-    // Make sure to include all functions like applyTheme, saveTheme, etc.
-    // This is a simplified version for demonstration
-    // Re-add your full functions from the previous working version
-    
-    // (Full functions from previous steps are assumed to be here)
+    // --- Initial Load ---
     loadTheme();
     updateGramFromToz();
     loadApp();
 });
-
-// NOTE: I've collapsed some functions for brevity. Please use the full functions
-// from our previous steps to ensure everything continues to work. The only
-// function that needs to be replaced is the searchInput event listener.
