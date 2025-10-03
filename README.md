@@ -98,7 +98,7 @@ country,name,date,silverWeight
 USA,Morgan Silver Dollar,1878-1921,0.773450
 USA,Peace Silver Dollar,1921-1935,0.773450
 UK,"Shilling, 92.5% Silver",1902-1919,0.168200
-
+```
 ---
 
 ## ⚖️ Disclaimer
