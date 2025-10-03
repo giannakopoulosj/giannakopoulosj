@@ -220,24 +220,22 @@ document.addEventListener('DOMContentLoaded', () => {
         saveQuantities();
     }
 
-    // --- CSV Loading and Parsing with VALIDATION ---
-    // UPDATED: Now returns both data and errors
     function parseCSV(text) {
         const lines = text.trim().split('\n');
         if (lines.length < 2) return { data: [], errors: [] };
 
         const headers = lines[0].split(',').map(h => h.trim());
         const data = [];
-        const errors = []; // Array to hold error messages
+        const errors = [];
 
         for (let i = 1; i < lines.length; i++) {
             const lineNumber = i + 1;
             if (lines[i].trim() === '') continue;
-            
+
             // Using the robust parser from before
             const values = [];
-            let currentField = '';
-            let inQuotes = false;
+            // (Your robust parsing logic to populate 'values' goes here)
+            let currentField = '', inQuotes = false;
             for (const char of lines[i]) {
                 if (char === '"' && inQuotes && lines[i][lines[i].indexOf(char) + 1] === '"') {
                     currentField += '"'; continue;
@@ -250,7 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             values.push(currentField.trim());
-            
+
+
             if (values.length === headers.length) {
                 const coinObject = {};
                 headers.forEach((header, index) => {
@@ -259,43 +258,49 @@ document.addEventListener('DOMContentLoaded', () => {
                     coinObject[header] = value;
                 });
 
-                // NEW: Validate silverWeight
-                const weight = parseFloat(coinObject.silverWeight);
+                // --- NEW VALIDATION LOGIC ---
+                const weightString = coinObject.silverWeight || '';
+                const weight = parseFloat(weightString);
+                const decimalPart = weightString.split('.')[1] || '';
+
                 if (isNaN(weight) || weight < 0) {
-                    errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${coinObject.silverWeight}". Skipping.`);
-                    continue; // Skip this coin
+                    errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${weightString}". Skipping.`);
+                    continue; // Skip due to invalid number
                 }
+                
+                if (decimalPart.length < 6) {
+                    errors.push(`Line ${lineNumber}: Invalid precision for coin "${coinObject.name}". Weight must have at least 6 decimal places (e.g., 0.123456). Skipping.`);
+                    continue; // Skip due to insufficient precision
+                }
+                
                 data.push(coinObject);
             } else {
                 errors.push(`Line ${lineNumber}: Incorrect number of columns. Skipping.`);
             }
         }
-        return { data, errors }; // Return both data and errors
+        return { data, errors };
     }
 
-    // UPDATED: Now handles displaying errors
+    // UPDATED: No changes here, but it will now display the new precision errors
     async function loadApp() {
         try {
             const response = await fetch('coins.csv');
             if (!response.ok) throw new Error(`Could not find coins.csv: ${response.statusText}`);
             
             const csvText = await response.text();
-            const result = parseCSV(csvText); // Get the result object
+            const result = parseCSV(csvText);
             
-            // NEW: Display any errors from the CSV
             if (result.errors.length > 0) {
                 errorContainer.style.display = 'block';
                 let errorHTML = '<h3>Warning: Issues found in coins.csv</h3><ul>';
-                result.errors.forEach(err => {
-                    errorHTML += `<li>${err}</li>`;
-                });
+                result.errors.forEach(err => { errorHTML += `<li>${err}</li>`; });
                 errorHTML += '</ul>';
                 errorContainer.innerHTML = errorHTML;
             } else {
                 errorContainer.style.display = 'none';
             }
 
-            groupedCoins = groupCoinsByCountry(result.data); // Use the valid data
+            groupedCoins = groupCoinsByCountry(result.data);
             renderCoins();
             loadQuantities();
             calculateTotals();
@@ -305,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             errorContainer.innerHTML = `<h3>Application Error</h3><p>${error.message}</p>`;
         }
     }
+
 
     // --- Initial Load ---
     loadTheme();
