@@ -3,8 +3,6 @@
 A dynamic, client-side web application for calculating the total silver weight and melt value of a coin collection. The application is managed entirely through a simple CSV file, making it easy to add, update, and manage your coin list without touching the code.
 
 ![Silver Coin Calculator Screenshot](screenshot.png)
-*(To add a screenshot, take a picture of the running application and save it as `screenshot.png` in the project directory.)*
-
 ---
 
 ## ✨ Features
