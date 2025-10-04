@@ -81,6 +81,16 @@ input[type="number"] {
     margin-bottom: 25px;
 }
 
+/* NEW: Style for the explanation text */
+.coin-format-explanation {
+    font-size: 0.85em; /* Small letters */
+    color: var(--text-muted-color); /* Subtle color */
+    text-align: center;
+    margin-top: -15px; /* Adjust to sit closer to the search bar */
+    margin-bottom: 25px; /* Maintain spacing before coin list */
+    padding: 5px 0;
+}
+
 .totals.filtered-active {
     border-color: var(--filtered-text-color-light);
 }
@@ -151,13 +161,7 @@ body.dark-mode .filtered-text {
     border-bottom: 1px solid var(--border-color);
 }
 .coin-item:last-child { border-bottom: none; }
-
-/* --- FIX FOR ALIGNMENT: Target any first child --- */
-.coin-item > *:first-child { /* Target any first child element (span or a) */
-    flex-grow: 1;
-    margin-right: 10px;
-}
-/* Ensure coin-quantity input is properly styled */
+.coin-item > *:first-child { flex-grow: 1; margin-right: 10px; }
 .coin-item input.coin-quantity {
     width: 60px;
     padding: 5px;
