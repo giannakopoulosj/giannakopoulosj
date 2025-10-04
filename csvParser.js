@@ -1,5 +1,9 @@
 // csvParser.js
-import { displayAppError } from './errorHandler.js'; // Still needed for fetchAndParseCSV's catch block
+import { displayAppError } from './errorHandler.js';
+
+const MAX_FIELD_LENGTH = 2000;
+const MAX_LINE_LENGTH = 10000;
+const MAX_ERRORS = 100; // Limit total errors displayed
 
 export function parseCSV(text) {
     const lines = text.trim().split('\n');
@@ -8,59 +12,75 @@ export function parseCSV(text) {
     const data = [];
     const errors = [];
 
-    // Helper function to parse a single CSV line reliably
-    function parseLine(line) {
+    function parseLine(line, lineNumber) {
         const result = [];
         let current = '';
         let inQuotes = false;
+        let fieldTruncated = false; // Flag to prevent duplicate field length errors for a single field
         
         for (let i = 0; i < line.length; i++) {
             const char = line[i];
-            const nextChar = line[i + 1]; // Look ahead for escaped quotes
+            const nextChar = line[i + 1];
             
             if (char === '"') {
                 if (inQuotes && nextChar === '"') {
-                    // This is an escaped quote (e.g., "a""b")
                     current += '"';
-                    i++; // Skip the next quote as it's part of the escape sequence
+                    i++; // Skip next quote
                 } else {
-                    // Toggle quote mode
                     inQuotes = !inQuotes;
                 }
             } else if (char === ',' && !inQuotes) {
-                // End of a field if not inside quotes
                 result.push(current.trim());
                 current = '';
+                fieldTruncated = false; // Reset for next field
             } else {
-                // Accumulate character for the current field
-                current += char;
+                // Character is accumulated only if within the max length
+                if (current.length < MAX_FIELD_LENGTH) {
+                    current += char;
+                } else { 
+                    // Field has exceeded max length - truncate it
+                    if (!fieldTruncated) { // Push error only once for this field
+                        errors.push(`Line ${lineNumber}: Field exceeded max length (${MAX_FIELD_LENGTH} chars). Field truncated.`);
+                        fieldTruncated = true;
+                    }
+                    // Character is intentionally not added to 'current' here, effectively truncating the field.
+                }
             }
         }
-        result.push(current.trim()); // Add the last field after the loop finishes
+        result.push(current.trim());
         return result;
     }
 
-    const headers = parseLine(lines[0]); // Parse the header line
+    const headers = parseLine(lines[0], 1); // Line 1 for headers
     
-    // --- Header Validation ---
     const requiredHeaders = ['country', 'name', 'date', 'grossWeight', 'purity'];
     const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
     if (missingHeaders.length > 0) {
         errors.push(`Missing required headers in CSV: ${missingHeaders.join(', ')}. Please check your CSV file.`);
-        return { data: [], errors };
+        return { data: [], errors }; // Early return for critical missing headers
     }
 
-    // --- Data Line Parsing and Validation ---
     for (let i = 1; i < lines.length; i++) {
+        // NEW: Total error limit check
+        if (errors.length >= MAX_ERRORS) {
+            errors.push(`Too many errors (${MAX_ERRORS}+). Remaining lines skipped.`); // Conciser message
+            break; // Exit the loop if too many errors are found
+        }
+
         const lineNumber = i + 1;
         const line = lines[i].trim();
-        if (line === '') continue; // Skip empty lines
+        if (line === '') continue;
 
-        const values = parseLine(line); // Parse the data line
+        if (line.length > MAX_LINE_LENGTH) {
+            errors.push(`Line ${lineNumber}: Line too long (${line.length} chars, max ${MAX_LINE_LENGTH}). Possible formatting error. Skipping.`);
+            continue;
+        }
+
+        const values = parseLine(line, lineNumber);
         
         if (values.length !== headers.length) {
             errors.push(`Line ${lineNumber}: Column count mismatch (${values.length} found, ${headers.length} expected). Skipping this line.`);
-            continue; // Skip this line if column count doesn't match headers
+            continue;
         }
 
         const coinObject = {};
@@ -70,26 +90,37 @@ export function parseCSV(text) {
 
         // --- Data Type and Value Validation ---
         
-        // grossWeight Validation
         const grossWeight = parseFloat(coinObject.grossWeight);
         if (isNaN(grossWeight) || grossWeight <= 0) {
             errors.push(`Line ${lineNumber}: Invalid gross weight "${coinObject.grossWeight}" for "${coinObject.name}". Must be a positive number. Skipping.`);
             continue;
         }
-        coinObject.grossWeight = grossWeight; // Store as number
+        coinObject.grossWeight = grossWeight;
 
-        // purity Validation
         const purity = parseFloat(coinObject.purity);
-        if (isNaN(purity) || purity <= 0 || purity > 1000) { // Purity should be between 1 and 1000 (per mille)
+        if (isNaN(purity) || purity <= 0 || purity > 1000) {
             errors.push(`Line ${lineNumber}: Invalid purity "${coinObject.purity}" for "${coinObject.name}". Must be between 1 and 1000. Skipping.`);
             continue;
         }
-        coinObject.purity = purity; // Store as number
+        coinObject.purity = purity;
+
+        if (coinObject.numistaUrl && coinObject.numistaUrl.trim() !== '') {
+            try {
+                const url = new URL(coinObject.numistaUrl);
+                if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+                    errors.push(`Line ${lineNumber}: Invalid URL protocol for "${coinObject.name}". Only http/https allowed. URL will be ignored.`);
+                    coinObject.numistaUrl = '';
+                }
+            } catch (e) {
+                errors.push(`Line ${lineNumber}: Malformed URL for "${coinObject.name}". URL will be ignored.`);
+                coinObject.numistaUrl = '';
+            }
+        }
         
-        data.push(coinObject); // Add valid coin to data
+        data.push(coinObject);
     }
     
-    return { data, errors }; // Return both parsed data and any collected errors
+    return { data, errors };
 }
 
 export async function fetchAndParseCSV(filePath) {
