@@ -1,12 +1,16 @@
 import { silverPriceTozEl, silverPriceGramEl } from './domElements.js';
 import { TROY_OUNCE_IN_GRAMS } from './constants.js';
+import { validatePositiveNumber } from './validation.js'; // Import utility
 
 export function updateGramFromToz() {
-    let tozPrice = parseFloat(silverPriceTozEl.value) || 0;
-    if (tozPrice < 0) {
-        tozPrice = 0;
-        silverPriceTozEl.value = '0';
+    const rawValue = silverPriceTozEl.value;
+    const tozPrice = validatePositiveNumber(rawValue);
+    
+    // Only update the input if validation changed the value (or if it was initially empty)
+    if (rawValue === '' || parseFloat(rawValue) !== tozPrice) {
+        silverPriceTozEl.value = tozPrice;
     }
+    
     silverPriceGramEl.value = (tozPrice / TROY_OUNCE_IN_GRAMS).toFixed(4);
 }
 
@@ -17,11 +21,14 @@ export function setupPriceListeners(calculateTotalsCallback) {
     });
 
     silverPriceGramEl.addEventListener('input', () => {
-        let gramPrice = parseFloat(silverPriceGramEl.value) || 0;
-        if (gramPrice < 0) {
-            gramPrice = 0;
-            silverPriceGramEl.value = '0';
+        const rawValue = silverPriceGramEl.value;
+        const gramPrice = validatePositiveNumber(rawValue);
+        
+        // Only update the input if validation changed the value (or if it was initially empty)
+        if (rawValue === '' || parseFloat(rawValue) !== gramPrice) {
+            silverPriceGramEl.value = gramPrice;
         }
+        
         silverPriceTozEl.value = (gramPrice * TROY_OUNCE_IN_GRAMS).toFixed(2);
         calculateTotalsCallback();
     });

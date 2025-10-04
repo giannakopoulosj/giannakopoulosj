@@ -1,9 +1,13 @@
+// calculator.js
 import { silverPriceTozEl, totalSilverWeightEl, totalMeltValueEl, coinListEl } from './domElements.js';
 import { saveQuantities } from './quantityManager.js';
+// NEW: Import both validation utilities
+import { validatePositiveNumber, validatePositiveInteger } from './validation.js'; 
 
 export function calculateTotals() {
     let grandTotalWeight = 0;
-    const currentSilverPriceToz = parseFloat(silverPriceTozEl.value) || 0;
+    // UPDATED: Use validatePositiveNumber for currentSilverPriceToz
+    const currentSilverPriceToz = validatePositiveNumber(silverPriceTozEl.value); 
 
     coinListEl.querySelectorAll('.coin-quantity').forEach(input => {
         const coinItem = input.closest('.coin-item');
@@ -13,13 +17,16 @@ export function calculateTotals() {
             if (subtotalEl) {
                 subtotalEl.textContent = `€0.00`;
             }
-            return; // Skip hidden inputs for grand totals
+            return;
         }
 
-        let quantity = parseInt(input.value) || 0;
-        if (quantity < 0) {
-            quantity = 0;
-            input.value = '0';
+        const rawValue = input.value;
+        // UPDATED: Use validatePositiveInteger for quantity
+        let quantity = validatePositiveInteger(rawValue); 
+        
+        // Only update the input if the original value was invalid or changed by validation
+        if (rawValue === '' || parseInt(rawValue, 10) !== quantity) {
+            input.value = quantity.toString();
         }
 
         const silverWeight = parseFloat(input.dataset.silverWeight);
