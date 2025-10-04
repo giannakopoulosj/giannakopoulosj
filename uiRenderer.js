@@ -22,10 +22,9 @@ export function renderCoins() {
 
             const silverGrams = parseFloat(coin.silverWeight_grams);
             const silverTOz = parseFloat(coin.silverWeight_tOz);
-            const purityValue = parseFloat(coin.purity); // Get purity value
+            const purityValue = parseFloat(coin.purity);
 
             let coinInfoText = `${coin.name} ${coin.date} - `;
-            // NEW: Include purity, e.g., (900‰ / 4.1750 g / 0.1342 tOz)
             coinInfoText += `(${isNaN(purityValue) ? 'N/A' : purityValue.toFixed(0)}‰ / `;
             coinInfoText += `${isNaN(silverGrams) ? 'N/A' : silverGrams.toFixed(4)} g / `;
             coinInfoText += `${isNaN(silverTOz) ? 'N/A' : silverTOz.toFixed(4)} tOz)`;
@@ -59,8 +58,13 @@ export function renderCoins() {
     });
 }
 
+// Reverted: Individual listeners are added here (not delegated to parent)
 export function setupCoinQuantityListeners(calculateTotalsCallback) {
-    coinListEl.querySelectorAll('.coin-quantity').forEach(input => {
-        input.addEventListener('input', calculateTotalsCallback);
-    });
+    if (coinListEl) {
+        coinListEl.querySelectorAll('.coin-quantity').forEach(input => {
+            input.addEventListener('input', calculateTotalsCallback);
+        });
+    } else {
+        console.error("coinListEl is null, cannot set up quantity listeners.");
+    }
 }
