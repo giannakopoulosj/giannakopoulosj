@@ -1,8 +1,9 @@
+// uiRenderer.js
 import { coinListEl } from './domElements.js';
 import { getGroupedCoins } from './dataManager.js';
 
 export function renderCoins() {
-    coinListEl.innerHTML = '';
+    coinListEl.innerHTML = ''; // Clear existing content
     const groupedCoins = getGroupedCoins();
     const countries = Object.keys(groupedCoins).sort();
 
@@ -19,29 +20,38 @@ export function renderCoins() {
             const coinItem = document.createElement('div');
             coinItem.className = 'coin-item';
 
-            // --- UPDATED RENDERING LOGIC HERE ---
+            const silverGrams = parseFloat(coin.silverWeight_grams);
+            const silverTOz = parseFloat(coin.silverWeight_tOz);
+            const purityValue = parseFloat(coin.purity); // Get purity value
+
+            let coinInfoText = `${coin.name} ${coin.date} - `;
+            // NEW: Include purity, e.g., (900‰ / 4.1750 g / 0.1342 tOz)
+            coinInfoText += `(${isNaN(purityValue) ? 'N/A' : purityValue.toFixed(0)}‰ / `;
+            coinInfoText += `${isNaN(silverGrams) ? 'N/A' : silverGrams.toFixed(4)} g / `;
+            coinInfoText += `${isNaN(silverTOz) ? 'N/A' : silverTOz.toFixed(4)} tOz)`;
+
             let coinNameHtml;
             if (coin.numistaUrl && coin.numistaUrl.trim() !== '') {
-                // If numistaUrl exists, create a link
                 coinNameHtml = `
                     <a href="${coin.numistaUrl}" target="_blank" rel="noopener noreferrer" class="coin-name-link">
-                        ${coin.name} ${coin.date} - (${coin.silverWeight} tOz)
+                        ${coinInfoText}
                     </a>
                 `;
             } else {
-                // Otherwise, render as a plain span
-                coinNameHtml = `<span>${coin.name} ${coin.date} - (${coin.silverWeight} tOz)</span>`;
+                coinNameHtml = `<span>${coinInfoText}</span>`;
             }
+
+            const dataSilverWeightValue = isNaN(silverTOz) ? '0' : silverTOz.toString();
 
             coinItem.innerHTML = `
                 ${coinNameHtml}
                 <input type="number" class="coin-quantity" 
                        data-key="${coinKey}" 
-                       data-silver-weight="${coin.silverWeight}"
-                       min="0" value="0">
+                       data-silver-weight="${dataSilverWeightValue}"
+                       min="0" 
+                       value="0" />
                 <span class="coin-subtotal">€0.00</span>
             `;
-            // --- END UPDATED RENDERING LOGIC ---
 
             detailsEl.appendChild(coinItem);
         });
