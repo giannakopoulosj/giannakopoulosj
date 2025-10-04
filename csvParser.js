@@ -1,3 +1,4 @@
+// csvParser.js
 import { displayAppError } from './errorHandler.js';
 
 export function parseCSV(text) {
@@ -7,6 +8,13 @@ export function parseCSV(text) {
     const headers = lines[0].split(',').map(h => h.trim());
     const data = [];
     const errors = [];
+
+    const requiredHeaders = ['country', 'name', 'date', 'grossWeight', 'purity'];
+    const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+    if (missingHeaders.length > 0) {
+        errors.push(`Missing required headers in CSV: ${missingHeaders.join(', ')}. Please check your CSV file.`);
+        return { data: [], errors }; // Stop parsing if essential headers are missing
+    }
 
     for (let i = 1; i < lines.length; i++) {
         const lineNumber = i + 1;
@@ -35,19 +43,23 @@ export function parseCSV(text) {
                 coinObject[header] = value;
             });
 
-            const weightString = coinObject.silverWeight || '';
-            const weight = parseFloat(weightString);
-            const decimalPart = weightString.split('.')[1] || '';
+            // --- Validate grossWeight and purity ---
+            const grossWeightString = coinObject.grossWeight || '';
+            const grossWeight = parseFloat(grossWeightString);
+            if (isNaN(grossWeight) || grossWeight <= 0) { // Must be positive
+                errors.push(`Line ${lineNumber}: Invalid gross weight for coin "${coinObject.name}". Value: "${grossWeightString}". Skipping.`);
+                continue;
+            }
+            coinObject.grossWeight = grossWeight; // Store as number
 
-            if (isNaN(weight) || weight < 0) {
-                errors.push(`Line ${lineNumber}: Invalid silver weight for coin "${coinObject.name}". Value: "${weightString}". Skipping.`);
+            const purityString = coinObject.purity || '';
+            const purity = parseFloat(purityString);
+            if (isNaN(purity) || purity <= 0 || purity > 1000) { // Purity 0-1000
+                errors.push(`Line ${lineNumber}: Invalid purity for coin "${coinObject.name}". Value: "${purityString}". Purity should be a positive number (e.g., 900 for 90%). Skipping.`);
                 continue;
             }
-            
-            if (decimalPart.length < 6) {
-                errors.push(`Line ${lineNumber}: Invalid precision for coin "${coinObject.name}". Weight must have at least 6 decimal places (e.g., 0.123456). Skipping.`);
-                continue;
-            }
+            coinObject.purity = purity; // Store as number
+            // --- End of validation ---
             
             data.push(coinObject);
         } else {

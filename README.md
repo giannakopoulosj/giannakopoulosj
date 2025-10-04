@@ -80,7 +80,7 @@ Because modern browsers restrict local file access for security reasons, you can
 
 This file is the heart of your application. It must follow a specific format.
 
-- The first line **must** contain these header names (order is flexible): `country,name,date,silverWeight,numistaUrl`
+- The first line **must** contain these header names (order is flexible): `country,name,date,grossWeight,purity,numistaUrl`
 - Each subsequent line represents a single type of coin.
 
 #### Column Descriptions:
@@ -90,16 +90,31 @@ This file is the heart of your application. It must follow a specific format.
 | `country`      | The country of origin. Used for grouping.                                                               | `USA`                          | Required.                                                |
 | `name`         | The name of the coin. If the name includes a comma, it **must** be enclosed in double quotes.            | `Morgan Silver Dollar` or `"Florin, Circulated"` | Required.                                                |
 | `date`         | The year or date range of the coin. This is treated as text.                                            | `1916-1945`                    | Required.                                                |
-| `silverWeight` | The silver weight of a single coin in Troy Ounces (tOz).                                                | `0.773450`                     | **Required**. Must be a non-negative number. **Must have at least 6 decimal places for precision.** |
-| `numistaUrl`   | (Optional) A full URL to the coin's page on Numista. If empty, the coin name will not be clickable.     | `https://en.numista.com/...`   | Optional. Must be a valid URL format for best practice.  |
+| `grossWeight`  | The total weight of the coin in **grams**.                                                              | `26.73`                        | **Required**. Must be a positive number.                 |
+| `purity`       | The purity of the coin's silver content. Use a whole number (per mille) like `900` for 90%.             | `900` (for 90%) or `835`       | **Required**. Must be a positive number between 1 and 1000. |
+| `numistaUrl`   | (Optional) A full URL to the coin's page on Numista. If empty, the coin name will not be clickable.     | `https://en.numista.com/...`   | Optional.                                                |
+
+**How Silver Weight is Calculated (and Displayed):**  
+The application automatically calculates the pure silver weight using the formula:  
+`Pure Silver Weight (grams) = grossWeight * (purity / 1000)`  
+`Pure Silver Weight (troy ounces) = Pure Silver Weight (grams) / 31.1034768`  
+
+These calculated values, along with the coin's purity, are displayed in the coin list in the format:  
+`(Purity‰ / Silver Weight in grams / Silver Weight in troy ounces)`  
+e.g., `(900‰ / 4.1750 g / 0.1342 tOz)`  
+These calculated `silverWeight_tOz` values are used for all melt value calculations.  
+
 
 **Example of Valid `coins.csv` content:**
 ```csv
-country,name,date,silverWeight
-USA,Morgan Silver Dollar,1878-1921,0.773450
-USA,Peace Silver Dollar,1921-1935,0.773450
-UK,"Shilling, 92.5% Silver",1902-1919,0.168200
+country,name,date,grossWeight,purity,numistaUrl
+USA,Morgan Silver Dollar,1878-1921,26.73,900,https://en.numista.com/catalogue/pieces5325.html
+UK,"Shilling, 92.5% Silver",1902-1919,5.65,925,https://en.numista.com/catalogue/pieces2747.html
+Austria,1 Corona,1901-1916,5.0,835,
 ```
+
+
+
 ---
 
 ## ⚖️ Disclaimer
