@@ -77,18 +77,8 @@ input[type="number"] {
 
 
 /* --- 3. COMPONENT STYLES --- */
-.totals, .silver-price, .search-container, .coin-list {
+.totals, .silver-price, .search-container, .coin-list, .coin-format-explanation {
     margin-bottom: 25px;
-}
-
-/* NEW: Style for the explanation text */
-.coin-format-explanation {
-    font-size: 0.85em; /* Small letters */
-    color: var(--text-muted-color); /* Subtle color */
-    text-align: center;
-    margin-top: -15px; /* Adjust to sit closer to the search bar */
-    margin-bottom: 25px; /* Maintain spacing before coin list */
-    padding: 5px 0;
 }
 
 .totals.filtered-active {
@@ -109,11 +99,45 @@ body.dark-mode .filtered-text {
     color: var(--filtered-text-color-dark);
 }
 
-
 .silver-price .price-input-group {
-    margin-bottom: 10px; display: flex; align-items: center;
+    margin-bottom: 10px; 
+    display: flex; 
+    align-items: center;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
 }
-.silver-price label { margin-right: 10px; min-width: 180px; }
+.silver-price label { 
+    margin-right: 10px; 
+    flex-basis: auto; /* Allow label to shrink */
+    white-space: nowrap; /* Prevent label text from breaking too early */
+}
+.silver-price .price-input-group input {
+    flex-grow: 1; /* Allow input to take up available space */
+    max-width: 200px; /* Prevent inputs from becoming too wide on large screens */
+    min-width: 100px; /* Ensure a minimum width */
+    box-sizing: border-box; /* Include padding/border in width calculation */
+}
+
+@media (max-width: 480px) {
+    .silver-price .price-input-group {
+        flex-direction: column; /* Stack label and input vertically */
+        align-items: flex-start; /* Align stacked items to the left */
+    }
+    .silver-price label {
+        margin-right: 0;
+        margin-bottom: 5px; /* Add space below label */
+        min-width: unset; /* Remove min-width on very small screens */
+    }
+    .silver-price .price-input-group input {
+        width: 100%; /* Make input full width when stacked */
+        max-width: unset;
+    }
+    .container {
+        padding: 1rem; /* Reduce padding on container for small screens */
+    }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.1rem; }
+}
+
 
 .clear-button {
     display: flex; align-items: center; justify-content: center; gap: 8px;
