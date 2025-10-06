@@ -1,6 +1,6 @@
 // searchFilter.js
 import { searchInput, clearSearchBtn, coinListEl, totalsSection, filteredIndicator } from './domElements.js';
-import { calculateTotals } from './calculator.js';
+import { calculateTotals } from '../core/calculator.js';
 
 /**
  * Filters the list of coins based on the current search input.

@@ -1,6 +1,6 @@
 // uiRenderer.js
 import { coinListEl } from './domElements.js';
-import { getGroupedCoins } from './dataManager.js';
+import { getGroupedCoins } from '../core/dataManager.js';
 
 export function renderCoins() {
     coinListEl.innerHTML = ''; // Clear existing content

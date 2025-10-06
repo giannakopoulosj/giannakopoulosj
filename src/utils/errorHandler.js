@@ -1,4 +1,4 @@
-import { errorContainer } from './domElements.js';
+import { errorContainer } from '../ui/domElements.js';
 
 export function displayErrors(errors) {
     if (errors.length > 0) {

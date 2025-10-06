@@ -1,4 +1,4 @@
-import { STORAGE_KEY } from './constants.js';
+import { STORAGE_KEY } from '../core/constants.js';
 import { coinListEl, clearAllBtn } from './domElements.js';
 
 export function saveQuantities() {

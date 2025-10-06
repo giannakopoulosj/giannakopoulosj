@@ -1,6 +1,6 @@
 import { silverPriceTozEl, silverPriceGramEl } from './domElements.js';
-import { TROY_OUNCE_IN_GRAMS } from './constants.js';
-import { validatePositiveNumber } from './validation.js'; // Import utility
+import { TROY_OUNCE_IN_GRAMS } from '../core/constants.js';
+import { validatePositiveNumber } from '../utils/validation.js'; // Import utility
 
 export function updateGramFromToz() {
     const rawValue = silverPriceTozEl.value;

@@ -1,15 +1,15 @@
 // main.js
-import { CSV_FILE_PATH } from './constants.js';
-import { fetchAndParseCSV } from './csvParser.js';
-import { groupCoinsByCountry } from './dataManager.js';
-import { renderCoins, setupCoinQuantityListeners } from './uiRenderer.js';
-import { loadQuantities, setupClearAllButton } from './quantityManager.js';
-import { setupPriceListeners, updateGramFromToz } from './priceManager.js';
-import { calculateTotals } from './calculator.js';
-import { setupSearchListeners, filterCoins } from './searchFilter.js';
-import { displayErrors, displayAppError } from './errorHandler.js';
-import { loadTheme, setupThemeToggle } from './theme.js';
-import { initializeDOMElements } from './domElements.js'; // NEW: Import the initializer function
+import { CSV_FILE_PATH } from './core/constants.js';
+import { fetchAndParseCSV } from './utils/csvParser.js';
+import { groupCoinsByCountry } from './core/dataManager.js';
+import { renderCoins, setupCoinQuantityListeners } from './ui/uiRenderer.js';
+import { loadQuantities, setupClearAllButton } from './ui/quantityManager.js';
+import { setupPriceListeners, updateGramFromToz } from './ui/priceManager.js';
+import { calculateTotals } from './core/calculator.js';
+import { setupSearchListeners, filterCoins } from './ui/searchFilter.js';
+import { displayErrors, displayAppError } from './utils/errorHandler.js';
+import { loadTheme, setupThemeToggle } from './ui/theme.js';
+import { initializeDOMElements } from './ui/domElements.js'; // NEW: Import the initializer function
 
 export async function initApp() {
     try {

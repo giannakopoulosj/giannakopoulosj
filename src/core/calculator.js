@@ -1,8 +1,8 @@
 // calculator.js
-import { silverPriceTozEl, totalSilverWeightEl, totalMeltValueEl, coinListEl } from './domElements.js';
-import { saveQuantities } from './quantityManager.js';
+import { silverPriceTozEl, totalSilverWeightEl, totalMeltValueEl, coinListEl } from '../ui/domElements.js';
+import { saveQuantities } from '../ui/quantityManager.js';
 // NEW: Import both validation utilities
-import { validatePositiveNumber, validatePositiveInteger } from './validation.js'; 
+import { validatePositiveNumber, validatePositiveInteger } from '../utils/validation.js'; 
 
 export function calculateTotals() {
     let grandTotalWeight = 0;
