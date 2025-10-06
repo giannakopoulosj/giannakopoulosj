@@ -1,0 +1,7 @@
+node_modules/
+tests/
+coverage/
+package-lock.json
+package.json
+.vscode/
+vitest.config.js
